@@ -119,5 +119,28 @@ namespace BangazonAPI.Controllers
             }
         }
 
+        //PUT: api/Customers/5
+        [HttpPut("{id}")]
+        public void Put(int id, [FromBody] Customer customer)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"UPDATE Customer
+                                        SET FirstName = @firstName,
+                                            LastName = @lastName
+                                        WHERE id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@FirstName", customer.FirstName));
+                    cmd.Parameters.Add(new SqlParameter("@LastName", customer.LastName));
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+
     }
 }
