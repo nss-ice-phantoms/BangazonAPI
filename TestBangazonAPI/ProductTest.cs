@@ -28,6 +28,24 @@ namespace TestBangazonAPI
         }
 
         [Fact]
+        public async Task Test_GetSingleProduct()
+        {
+
+            using (var client = new APIClientProvider().Client)
+            {
+                int getThisId = 2;
+
+                var response = await client.GetAsync($"api/products/{getThisId}");
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var productReturned = JsonConvert.DeserializeObject<Product>(responseBody);
+
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.True(productReturned.Id == getThisId);
+            }
+        }
+
+        [Fact]
         public async Task Test_Create_Product()
         {
             using (var client = new APIClientProvider().Client)

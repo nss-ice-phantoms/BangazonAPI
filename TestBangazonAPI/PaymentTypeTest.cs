@@ -28,6 +28,24 @@ namespace TestBangazonAPI
         }
 
         [Fact]
+        public async Task Test_GetSinglePaymentType()
+        {
+
+            using (var client = new APIClientProvider().Client)
+            {
+                int getThisId = 2;
+
+                var response = await client.GetAsync($"api/paymenttypes/{getThisId}");
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var paymentTypeReturned = JsonConvert.DeserializeObject<PaymentType>(responseBody);
+
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.True(paymentTypeReturned.Id == getThisId);
+            }
+        }
+
+        [Fact]
         public async Task Test_Create_PaymentType()
         {
             using (var client = new APIClientProvider().Client)

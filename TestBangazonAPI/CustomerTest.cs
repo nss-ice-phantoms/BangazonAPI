@@ -27,6 +27,26 @@ namespace TestBangazonAPI
             }
         }
 
+
+        
+        [Fact]
+        public async Task Test_GetSingleCustomer()
+        {
+
+            using (var client = new APIClientProvider().Client)
+            {
+                int getThisId = 2;
+
+                var response = await client.GetAsync($"api/customers/{getThisId}");
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var customerReturned = JsonConvert.DeserializeObject<Customer>(responseBody);
+
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.True(customerReturned.Id == getThisId);
+            }
+        }
+
         [Fact]
         public async Task Test_Create_Customer()
         {
