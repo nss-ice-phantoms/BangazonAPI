@@ -12,7 +12,7 @@ namespace TestBangazonAPI {
 
     public class ComputerTests {
 
-        public int testComputerId = 4;
+        public int testComputerId;
 
         [Fact]
         public async Task TestGetComputers() {
