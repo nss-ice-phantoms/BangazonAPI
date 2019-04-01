@@ -5,6 +5,7 @@ a single-page application webpage and its data is tracked through a powerful, ha
 ## Table of Contents
 - Software Requirements
 - Entity Relationship Diagram
+- Database Setup
 - Http Request Methods:
 1. Customer
 1. Product
@@ -20,10 +21,14 @@ a single-page application webpage and its data is tracked through a powerful, ha
 ## Software Requirements
 - Sql Server Manangment Studio
 - Visual Studio Community 2017
+- Postman
 - Google Chrome
 
 ## Enitity Relationship Diagram
 <img src="erd.png" width="900" />
+
+## Database Setup
+(to be added)
 
 ## Http Request Methods
 
