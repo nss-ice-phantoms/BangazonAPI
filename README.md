@@ -34,7 +34,8 @@ Coming soon.
 
 select `POST` then paste `localhost:5000/customer`into the field, then click Body underneath the field, then select raw, and then paste this snippet or make one similar
 
-```{
+```
+{
 	"FirstName": "Testing",
 	"LastName": "OneTwo"
    }
@@ -44,7 +45,8 @@ then click send. The result should be the new customer you made.
 ##PUT
 
 select `PUT` then paste `localhost:5000/customer` or any other `Customer Id`, then click Body underneath the field, then select raw, and then paste this snippet or make one similar
-```{
+```
+{
 	"FirstName": "Testing",
 	"LastName": "NewLastName"
    }
