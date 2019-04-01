@@ -30,16 +30,23 @@ namespace BangazonAPI.Controllers
                 return new SqlConnection(configuration.GetConnectionString("DefaultConnection"));
             }
         }
+
         //GET: api/customers
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult Get(string include, string q)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT c.id, c.firstname, c.lastname FROM Customer c";
+                    cmd.CommandText = "SELECT c.id, c.firstname, c.lastname FROM Customer c WHERE 1 = 1";
+
+                    if (!string.IsNullOrWhiteSpace(q))
+                    {
+                        cmd.CommandText += @"AND c.firstName LIKE @q or c.lastName LIKE @q";
+                        cmd.Parameters.Add(new SqlParameter("@q", $"%{q}%"));
+                    }
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     List<Customer> customers = new List<Customer>();
@@ -56,6 +63,7 @@ namespace BangazonAPI.Controllers
 
                     reader.Close();
                     if (customers.Count == 0)
+
                     {
                         return NoContent();
                     }
