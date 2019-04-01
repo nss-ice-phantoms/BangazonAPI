@@ -54,7 +54,132 @@ select `PUT` then paste `localhost:5000/customers` or any other `Customer Id`, t
 
 You should get nothing back from this. When you run the `GET` query the Customer you specified in your `PUT` query should show the updated, edited information you gave it.
 
+# 2. Payment Types
+Use the command `dotnet run` to start the program, BangazonAPI. Once the program is running, open up the Postman desktop app and run the following commands for each request method:
 
+`GET`
+To GET all product types, select GET in Postman then paste `localhost:5000/PaymentTypes` into the field and click send. The result should be an array of all the payment type in the database that should look like:
+```
+[
+{
+"paymentTypeId": 1,
+   "paymentTypeName": "Visa",
+   "AcctNumber": 1,
+   "CustomerId": 2
+ },
+ {
+   "paymentTypeId": 2,
+   "paymentTypeName": "MasterCard",
+   "AcctNumber": 1,
+   "CustomerId": 2
+ },
+ {
+   "paymentTypeId": 3,
+   "paymentTypeName": "Discover",
+   "AcctNumber": 1,
+   "CustomerId": 2
+}
+]
+```
+To GET a specific, single payment type, add an /{id} to the end of the l`ocalhost:5000/PaymentTypes` URL. The result should only include the single payment type with the Id you added like the below:
 
+```
+[
+{
+"paymentTypeId": 3,
+   "paymentTypeName": "Discover",
+   "AcctNumber": 1,
+   "CustomerId": 2
+}
+]
+```
+## POST
+To POST a new object to your existing array for PaymentType, select POST, then paste `localhost:5000/PaymentTypes` into the field. Then click Body underneath the field, select raw, and then paste this below snippet or make one similar then click send. The result should be the new PaymentType you made:
 
+```
+{
+	"paymentTypeName": "New Value"
+}
+```
+## PUT
+To update an existing PaymentType, select PUT then paste `localhost:5000/paymentTypes/2` or any other existing order. Then follow the same directions as the POST example, and change the values then click send:
+```
+{
+	"paymentTypeName": "New Value"
+}
+```
+You should get nothing back from this besides an OK status. When you run the GET query the computer you specified in your PUT query should show the updated, edited information you gave it.
 
+## DELETE
+To DELETE an existing product type, select DELETE then paste `localhost:5000/PaymentTypes/2` or any other existing PaymentType then click send. You should get nothing back from this besides an OK status. When you run the GET query the order with the Id you specified in your DELETE query should no longer exist.
+
+# 3. Product
+Use the command `dotnet run` to start the program, BangazonAPI. Once the program is running, open up the Postman desktop app and run the following commands for each request method:
+
+`GET`
+To GET all product types, select GET in Postman then paste `localhost:5000/Products` into the field and click send. The result should be an array of all the products in the database that should look like:
+```
+[
+{
+    "Id": 1,
+   "Price": 1,
+   "Title": "neato",
+   "Description": "Rad",
+   "Quantity": 2,
+   "ProductTypeId": 2,
+   "CustomerId": 2
+ },
+ {
+   "Id": 2,
+   "Price": 21,
+   "Title": "aTitle,
+   "Description": "Rad",
+   "Quantity": 2,
+   "ProductTypeId": 2,
+   "CustomerId": 2
+ },
+ {
+   "Id": 3,
+   "Price": 1,
+   "Title": "stuff",
+   "Description": "Rad",
+   "Quantity": 2,
+   "ProductTypeId": 2,
+   "CustomerId": 2
+}
+]
+```
+To GET a specific, single product type, add an /{id} to the end of the l`ocalhost:5000/products` URL. The result should only include the single product  with the Id you added like the below:
+
+```
+[
+{
+   "Id": 3,
+   "Price": 1,
+   "Title": "stuff",
+   "Description": "Rad",
+   "Quantity": 2,
+   "ProductTypeId": 2,
+   "CustomerId": 2
+}
+]
+```
+## POST
+To POST a new object to your existing array for Product, select POST, then paste `localhost:5000/Products` into the field. Then click Body underneath the field, select raw, and then paste this below snippet or make one similar then click send. The result should be the new Product you made:
+
+```
+{
+	"Product": "New Value"
+}
+```
+## PUT
+To update an existing PaymentType, select PUT then paste `localhost:5000/products/2` or any other existing order. Then follow the same directions as the POST example, and change the values then click send:
+```
+{
+	"paymentTypeName": "New Value"
+}
+```
+You should get nothing back from this besides an OK status. When you run the GET query the computer you specified in your PUT query should show the updated, edited information you gave it.
+
+## DELETE
+To DELETE an existing product type, select DELETE then paste `localhost:5000/products/2` or any other existing product then click send. You should get nothing back from this besides an OK status. When you run the GET query the order with the Id you specified in your DELETE query should no longer exist.
