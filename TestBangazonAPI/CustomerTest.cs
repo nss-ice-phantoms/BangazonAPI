@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 using BangazonAPI.Models;
@@ -35,15 +36,19 @@ namespace TestBangazonAPI
 
             using (var client = new APIClientProvider().Client)
             {
-                int getThisId = 2;
+                var customerGetInitialResponse = await client.GetAsync("api/customers");
+                string initialResponseBody = await customerGetInitialResponse.Content.ReadAsStringAsync();
+                var customerList = JsonConvert.DeserializeObject<List<Customer>>(initialResponseBody);
+                Assert.Equal(HttpStatusCode.OK,customerGetInitialResponse.StatusCode);
+                var customerObject = customerList[0];
 
-                var response = await client.GetAsync($"api/customers/{getThisId}");
+                var response = await client.GetAsync($"api/customers/{customerObject.Id}");
 
                 string responseBody = await response.Content.ReadAsStringAsync();
                 var customerReturned = JsonConvert.DeserializeObject<Customer>(responseBody);
 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.True(customerReturned.Id == getThisId);
+                Assert.True(customerReturned.Id == customerObject.Id);
             }
         }
 

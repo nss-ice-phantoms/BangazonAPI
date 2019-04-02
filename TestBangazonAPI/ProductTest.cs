@@ -33,15 +33,20 @@ namespace TestBangazonAPI
 
             using (var client = new APIClientProvider().Client)
             {
-                int getThisId = 2;
+                var productGetInitialResponse = await client.GetAsync("api/products");
+                string initialResponseBody = await productGetInitialResponse.Content.ReadAsStringAsync();
+                var productList = JsonConvert.DeserializeObject<List<Product>>(initialResponseBody);
+                Assert.Equal(HttpStatusCode.OK,productGetInitialResponse.StatusCode);
+                var productObject = productList[0];
 
-                var response = await client.GetAsync($"api/products/{getThisId}");
+                //BEGIN GET SPECIFIC TESTING
+                var response = await client.GetAsync($"api/products/{productObject.Id}");
 
                 string responseBody = await response.Content.ReadAsStringAsync();
                 var productReturned = JsonConvert.DeserializeObject<Product>(responseBody);
 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.True(productReturned.Id == getThisId);
+                Assert.True(productReturned.Id == productObject.Id);
             }
         }
 
@@ -81,40 +86,40 @@ namespace TestBangazonAPI
         [Fact]
         public async Task Test_Modify_Product()
         {
-            string newTitle = "Saturn";
-            string newDesc = "Sega game sys";
-
             using (var client = new APIClientProvider().Client)
             {
-                int alterThisId = 5;
 
-                Product modifyProduct = new Product
-                {
-                    ProductTypeId = 2,
-                    CustomerId = 1,
-                    Price = 250,
-                    Title = newTitle,
-                    Description = newDesc,
-                    Quantity = 1
-                };
+                var productGetInitialResponse = await client.GetAsync("api/products");
+                string initialResponseBody = await productGetInitialResponse.Content.ReadAsStringAsync();
+                var productList = JsonConvert.DeserializeObject<List<Product>>(initialResponseBody);
+                Assert.Equal(HttpStatusCode.OK, productGetInitialResponse.StatusCode);
 
-                var modifiedProductAsJson = JsonConvert.SerializeObject(modifyProduct);
+                var productObject = productList[0];
+                var defaultProductTitle = productObject.Title;
 
-                var response = await client.PutAsync($"api/products/{alterThisId}",
+                //BEGIN PUT TEST
+                productObject.Title = "ThisIsATest";
+                var modifiedProductAsJson = JsonConvert.SerializeObject(productObject);
+                var response = await client.PutAsync($"api/products/{productObject.Id}",
                     new StringContent(modifiedProductAsJson, Encoding.UTF8, "application/json"));
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-                var getProduct = await client.GetAsync($"api/products/{alterThisId}");
+                var getProduct = await client.GetAsync($"api/products/{productObject.Id}");
                 getProduct.EnsureSuccessStatusCode();
 
                 string getProductBody = await getProduct.Content.ReadAsStringAsync();
                 Product newProduct = JsonConvert.DeserializeObject<Product>(getProductBody);
+                Assert.Equal("ThisIsATest", newProduct.Title);
 
-                Assert.Equal(newTitle, newProduct.Title);
-                Assert.Equal(newDesc, newProduct.Description);
+                newProduct.Title = defaultProductTitle;
+                var returnProductToDefault = JsonConvert.SerializeObject(newProduct);
+
+                var putProductToDefault = await client.PutAsync($"api/products/{newProduct.Id}",
+                    new StringContent(returnProductToDefault, Encoding.UTF8, "application/json"));
+                string originalProductObject = await response.Content.ReadAsStringAsync();
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             }
         }
 
@@ -123,15 +128,20 @@ namespace TestBangazonAPI
         {
             using (var client = new APIClientProvider().Client)
             {
-                int deleteThisId = 5;
+                var productGetInitialResponse = await client.GetAsync("api/products");
+                string initialResponseBody = await productGetInitialResponse.Content.ReadAsStringAsync();
+                var productList = JsonConvert.DeserializeObject<List<Product>>(initialResponseBody);
+                Assert.Equal(HttpStatusCode.OK, productGetInitialResponse.StatusCode);
+                int removeLastObject = productList.Count - 1;
+                var productObject = productList[removeLastObject];
 
-                var response = await client.DeleteAsync($"api/products/{deleteThisId}");
+                var response = await client.DeleteAsync($"api/products/{productObject.Id}");
 
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-                var getProduct = await client.GetAsync($"api/products/{deleteThisId}");
+                var getProduct = await client.GetAsync($"api/products/{productObject.Id}");
                 getProduct.EnsureSuccessStatusCode();
 
                 string getProductBody = await getProduct.Content.ReadAsStringAsync();
