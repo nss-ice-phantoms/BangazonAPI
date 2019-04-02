@@ -11,8 +11,6 @@ namespace TestBangazonAPI {
 
     public class DepartmentTests {
 
-        public int testDeptId;
-
         [Fact]
         public async Task TestGetDepartments() {
 
@@ -80,53 +78,48 @@ namespace TestBangazonAPI {
         [Fact]
         public async Task TestUpdateDepartment() {
 
-            // New department name to change to and test
-            string newDepartmentName = "Test Department2";
-
             using (var client = new APIClientProvider().Client) {
-                /* ARRANGE */
 
-                var getDepartmentToUpdate = await client.GetAsync($"/api/departments/{testDeptId}");
-                getDepartmentToUpdate.EnsureSuccessStatusCode();
+                var departmentGetInitialResponse = await client.GetAsync("api/departments");
 
-                string getDepartmentToUpdateBody = await getDepartmentToUpdate.Content.ReadAsStringAsync();
-                var departmentToUpdate = JsonConvert.DeserializeObject<Department>(getDepartmentToUpdateBody);
+                string initialResponseBody = await departmentGetInitialResponse.Content.ReadAsStringAsync();
 
-                int departmentToUpdateId = departmentToUpdate.Id;
+                var departmentList = JsonConvert.DeserializeObject<List<Department>>(initialResponseBody);
 
-                /*
-                    PUT section
-                */
-                Department modifiedDepartment = new Department {
-                    Id = 6,
-                    Name = newDepartmentName,
-                    Budget = 350000,
-                };
+                Assert.Equal(HttpStatusCode.OK, departmentGetInitialResponse.StatusCode);
 
-                var modifiedDepartmentAsJSON = JsonConvert.SerializeObject(modifiedDepartment);
+                var departmentObject = departmentList[0];
+                var defaultDepartmentName = departmentObject.Name;
 
-                var response = await client.PutAsync(
-                    $"/api/departments/{departmentToUpdateId}",
-                    new StringContent(modifiedDepartmentAsJSON, Encoding.UTF8, "application/json")
-                );
+                //BEGIN PUT TEST
+                departmentObject.Name = "TestName";
+
+                var modifiedDepartmentAsJson = JsonConvert.SerializeObject(departmentObject);
+
+                var response = await client.PutAsync($"api/departments/{ departmentObject.Id}",
+                    new StringContent(modifiedDepartmentAsJson, Encoding.UTF8, "application/json"));
 
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-
-                /*
-                    GET section
-                    Verify that the PUT operation was successful
-                */
-                var getDepartment = await client.GetAsync($"/api/departments/{departmentToUpdateId}");
+                var getDepartment = await client.GetAsync($"api/departments/{ departmentObject.Id}");
                 getDepartment.EnsureSuccessStatusCode();
 
                 string getDepartmentBody = await getDepartment.Content.ReadAsStringAsync();
                 Department newDepartment = JsonConvert.DeserializeObject<Department>(getDepartmentBody);
 
-                Assert.Equal(HttpStatusCode.OK, getDepartment.StatusCode);
-                Assert.Equal(newDepartmentName, newDepartment.Name);
+                Assert.Equal("TestName", newDepartment.Name);
+
+                newDepartment.Name = defaultDepartmentName;
+                var returnDepartmentToDefault = JsonConvert.SerializeObject(newDepartment);
+
+                var putDepartmentToDefault = await client.PutAsync($"api/departments/{newDepartment.Id}",
+                    new StringContent(returnDepartmentToDefault, Encoding.UTF8, "application/json"));
+
+                string originalDepartmentObject = await response.Content.ReadAsStringAsync();
+
+                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode); ;
             }
 
         }

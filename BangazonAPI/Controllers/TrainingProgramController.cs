@@ -75,9 +75,9 @@ namespace BangazonAPI.Controllers {
                             Attendees = new List<Employee>()
                         };
 
-                        if (!reader.IsDBNull(reader.GetOrdinal("ProgramId"))) {
+                        if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId"))) {
 
-                            int employeeId = reader.GetInt32(reader.GetOrdinal("ProgramId"));
+                            int employeeId = reader.GetInt32(reader.GetOrdinal("EmployeeId"));
 
                             if (!program.Attendees.Any(e => e.Id == employeeId)) {
 
@@ -103,8 +103,6 @@ namespace BangazonAPI.Controllers {
         [HttpGet("{id}", Name = "GetProgram")]
         public IActionResult Get(int id) {
 
-            TrainingProgram program = new TrainingProgram();
-
             using (SqlConnection conn = Connection) {
 
                 conn.Open();
@@ -121,7 +119,9 @@ namespace BangazonAPI.Controllers {
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    while (reader.Read()) {
+                    TrainingProgram program = null;
+
+                    if (reader.Read()) {
 
                         if (program == null) {
 
@@ -135,9 +135,9 @@ namespace BangazonAPI.Controllers {
                             };
                         }
 
-                        if (!reader.IsDBNull(reader.GetOrdinal("ProgramId"))) {
+                        if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId"))) {
 
-                            int employeeId = reader.GetInt32(reader.GetOrdinal("ProgramId"));
+                            int employeeId = reader.GetInt32(reader.GetOrdinal("EmployeeId"));
 
                             if (!program.Attendees.Any(e => e.Id == employeeId)) {
 
@@ -153,8 +153,8 @@ namespace BangazonAPI.Controllers {
                         }
                     }
                     reader.Close();
+                    return Ok(program);
                 }
-                return Ok(program);
             }
         }
 

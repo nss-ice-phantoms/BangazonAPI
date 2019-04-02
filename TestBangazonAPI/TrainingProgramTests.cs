@@ -12,8 +12,6 @@ namespace TestBangazonAPI {
 
     public class TrainingProgramTests {
 
-        public int testTrainingProgramId;
-
         [Fact]
         public async Task TestGetTrainingPrograms() {
 
@@ -71,8 +69,6 @@ namespace TestBangazonAPI {
                 // Deserialize the JSON into an instance of TrainingProgram
                 var newTrainingProgram = JsonConvert.DeserializeObject<TrainingProgram>(responseBody);
 
-                testTrainingProgramId = newTrainingProgram.Id;
-
                 /* ASSERT */
 
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -83,54 +79,48 @@ namespace TestBangazonAPI {
         [Fact]
         public async Task TestUpdateTrainingProgram() {
 
-            // New trainingProgram name to change to and test
-            string newTrainingProgramName = "Test TrainingProgram2";
-
             using (var client = new APIClientProvider().Client) {
-                /* ARRANGE */
 
-                var getTrainingProgramToUpdate = await client.GetAsync($"/api/trainingprograms/{testTrainingProgramId}");
-                getTrainingProgramToUpdate.EnsureSuccessStatusCode();
+                var trainingProgramGetInitialResponse = await client.GetAsync("api/trainingprograms");
 
-                string getTrainingProgramToUpdateBody = await getTrainingProgramToUpdate.Content.ReadAsStringAsync();
-                var trainingProgramToUpdate = JsonConvert.DeserializeObject<TrainingProgram>(getTrainingProgramToUpdateBody);
+                string initialResponseBody = await trainingProgramGetInitialResponse.Content.ReadAsStringAsync();
 
-                int trainingProgramToUpdateId = trainingProgramToUpdate.Id;
+                var trainingProgramList = JsonConvert.DeserializeObject<List<TrainingProgram>>(initialResponseBody);
 
-                /*
-                    PUT section
-                */
-                TrainingProgram modifiedTrainingProgram = new TrainingProgram {
-                    Id = testTrainingProgramId,
-                    Name = newTrainingProgramName,
-                    StartDate = trainingProgramToUpdate.StartDate,
-                    EndDate = trainingProgramToUpdate.EndDate
-                };
+                Assert.Equal(HttpStatusCode.OK, trainingProgramGetInitialResponse.StatusCode);
 
-                var modifiedTrainingProgramAsJSON = JsonConvert.SerializeObject(modifiedTrainingProgram);
+                var trainingProgramObject = trainingProgramList[0];
+                var defaultTrainingProgramName = trainingProgramObject.Name;
 
-                var response = await client.PutAsync(
-                    $"/api/trainingprograms/{trainingProgramToUpdateId}",
-                    new StringContent(modifiedTrainingProgramAsJSON, Encoding.UTF8, "application/json")
-                );
+                //BEGIN PUT TEST
+                trainingProgramObject.Name = "TestName";
+
+                var modifiedTrainingProgramAsJson = JsonConvert.SerializeObject(trainingProgramObject);
+
+                var response = await client.PutAsync($"api/trainingprograms/{trainingProgramObject.Id}",
+                    new StringContent(modifiedTrainingProgramAsJson, Encoding.UTF8, "application/json"));
 
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-
-                /*
-                    GET section
-                    Verify that the PUT operation was successful
-                */
-                var getTrainingProgram = await client.GetAsync($"/api/trainingprograms/{trainingProgramToUpdateId}");
+                var getTrainingProgram = await client.GetAsync($"api/trainingprograms/{trainingProgramObject.Id}");
                 getTrainingProgram.EnsureSuccessStatusCode();
 
                 string getTrainingProgramBody = await getTrainingProgram.Content.ReadAsStringAsync();
                 TrainingProgram newTrainingProgram = JsonConvert.DeserializeObject<TrainingProgram>(getTrainingProgramBody);
 
-                Assert.Equal(HttpStatusCode.OK, getTrainingProgram.StatusCode);
-                Assert.Equal("Test TrainingProgram2", newTrainingProgram.Name);
+                Assert.Equal("TestName", newTrainingProgram.Name);
+
+                newTrainingProgram.Name = defaultTrainingProgramName;
+                var returnTrainingProgramToDefault = JsonConvert.SerializeObject(newTrainingProgram);
+
+                var putTrainingProgramToDefault = await client.PutAsync($"api/trainingprograms/{newTrainingProgram.Id}",
+                    new StringContent(returnTrainingProgramToDefault, Encoding.UTF8, "application/json"));
+
+                string originalTrainingProgramObject = await response.Content.ReadAsStringAsync();
+
+                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode); ;
             }
         }
 
@@ -138,36 +128,32 @@ namespace TestBangazonAPI {
         public async Task TestDeleteTrainingProgram() {
 
             using (var client = new APIClientProvider().Client) {
-                /* ARRANGE */
 
-                /* ARRANGE */
+                var trainingProgramGetInitialResponse = await client.GetAsync("api/trainingprograms");
 
-                var getTrainingProgramToDelete = await client.GetAsync($"/api/trainingprograms/{testTrainingProgramId}");
-                getTrainingProgramToDelete.EnsureSuccessStatusCode();
+                string initialResponseBody = await trainingProgramGetInitialResponse.Content.ReadAsStringAsync();
 
-                string getTrainingProgramToDeleteBody = await getTrainingProgramToDelete.Content.ReadAsStringAsync();
-                var trainingProgramToDelete = JsonConvert.DeserializeObject<TrainingProgram>(getTrainingProgramToDeleteBody);
+                var trainingProgramList = JsonConvert.DeserializeObject<List<TrainingProgram>>(initialResponseBody);
 
-                int trainingProgramToDeleteId = trainingProgramToDelete.Id;
-                /* ACT */
+                Assert.Equal(HttpStatusCode.OK, trainingProgramGetInitialResponse.StatusCode);
 
-                // Use the client to send the request and store the response
-                var response = await client.DeleteAsync($"/api/trainingprograms/{trainingProgramToDeleteId}");
+                int removeLastObject = trainingProgramList.Count - 1;
+                var trainingProgramObject = trainingProgramList[removeLastObject];
 
-                // Store the JSON body of the response
+                var response = await client.DeleteAsync($"api/trainingprograms/{ trainingProgramObject.Id}");
+
                 string responseBody = await response.Content.ReadAsStringAsync();
-
-                /* ASSERT */
 
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-                var getTrainingProgram = await client.GetAsync($"/api/trainingprograms/{trainingProgramToDeleteId}");
+                var getTrainingProgram = await client.GetAsync($"api/trainingprograms/{ trainingProgramObject.Id}");
                 getTrainingProgram.EnsureSuccessStatusCode();
 
                 string getTrainingProgramBody = await getTrainingProgram.Content.ReadAsStringAsync();
+
                 TrainingProgram newTrainingProgram = JsonConvert.DeserializeObject<TrainingProgram>(getTrainingProgramBody);
 
-                Assert.Equal(HttpStatusCode.OK, getTrainingProgram.StatusCode);
+                Assert.Equal(HttpStatusCode.NoContent, getTrainingProgram.StatusCode);
             }
 
         }
