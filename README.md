@@ -115,6 +115,7 @@ To GET a specific, single payment type, add an /{id} to the end of the l`ocalhos
 ```
 
 **POST**
+
 To POST a new object to your existing array for PaymentType, select POST, then paste `localhost:5000/PaymentTypes` into the field. Then click Body underneath the field, select raw, and then paste this below snippet or make one similar then click send. The result should be the new PaymentType you made:
 
 ```
@@ -123,6 +124,7 @@ To POST a new object to your existing array for PaymentType, select POST, then p
 }
 ```
 **PUT**
+
 To update an existing PaymentType, select PUT then paste `localhost:5000/paymentTypes/2` or any other existing order. Then follow the same directions as the POST example, and change the values then click send:
 ```
 {
@@ -132,12 +134,14 @@ To update an existing PaymentType, select PUT then paste `localhost:5000/payment
 You should get nothing back from this besides an OK status. When you run the GET query the computer you specified in your PUT query should show the updated, edited information you gave it.
 
 **DELETE**
+
 To DELETE an existing product type, select DELETE then paste `localhost:5000/PaymentTypes/2` or any other existing PaymentType then click send. You should get nothing back from this besides an OK status. When you run the GET query the order with the Id you specified in your DELETE query should no longer exist.
 
 ### 3. Product
 Use the command `dotnet run` to start the program, BangazonAPI. Once the program is running, open up the Postman desktop app and run the following commands for each request method:
 
 **GET**
+
 To GET all product types, select GET in Postman then paste `localhost:5000/Products` into the field and click send. The result should be an array of all the products in the database that should look like:
 
 ```
@@ -187,6 +191,7 @@ To GET a specific, single product type, add an /{id} to the end of the l`ocalhos
 ]
 ```
 **POST**
+
 To POST a new object to your existing array for Product, select POST, then paste `localhost:5000/Products` into the field. Then click Body underneath the field, select raw, and then paste this below snippet or make one similar then click send. The result should be the new Product you made:
 
 ```
@@ -195,6 +200,7 @@ To POST a new object to your existing array for Product, select POST, then paste
 }
 ```
 **PUT**
+
 To update an existing PaymentType, select PUT then paste `localhost:5000/products/2` or any other existing order. Then follow the same directions as the POST example, and change the values then click send:
 ```
 {
@@ -204,6 +210,7 @@ To update an existing PaymentType, select PUT then paste `localhost:5000/product
 You should get nothing back from this besides an OK status. When you run the GET query the computer you specified in your PUT query should show the updated, edited information you gave it.
 
 **DELETE**
+
 To DELETE an existing product type, select DELETE then paste `localhost:5000/products/2` or any other existing product then click send. You should get nothing back from this besides an OK status. When you run the GET query the order with the Id you specified in your DELETE query should no longer exist.
 
 ### 4. Order
