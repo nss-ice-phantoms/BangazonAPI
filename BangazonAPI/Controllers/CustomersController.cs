@@ -33,14 +33,14 @@ namespace BangazonAPI.Controllers
 
         //GET: api/customers
         [HttpGet]
-        public IActionResult Get(string include, string q)
+        public IActionResult Get(string _include, string q)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    if (string.IsNullOrWhiteSpace(include))
+                    if (string.IsNullOrWhiteSpace(_include))
                     {
                         cmd.CommandText = "SELECT c.id, c.firstname, c.lastname FROM Customer c";
 
@@ -80,7 +80,7 @@ namespace BangazonAPI.Controllers
                     }
                     else
                     {
-                        if(include == "products") { 
+                        if(_include == "products") { 
                         cmd.CommandText =
                             "SELECT c.id AS CustomerId, c.firstname, c.lastname, p.id AS ProductId, p.ProductTypeId, p.CustomerId AS ProductsCustomerId, p.Price, p.Title, p.Description, p.Quantity, pt.id AS PaymentTypeId, pt.AcctNumber, pt.Name, pt.CustomerId AS PaymentTypeCustomerId " +
                             "FROM Customer c " +
@@ -152,7 +152,7 @@ namespace BangazonAPI.Controllers
                         {
                             return Ok(customers.Values.ToList());
                         }
-                    } else if (include == "payments")
+                    } else if (_include == "payments")
                         {
                             cmd.CommandText =
                                 "SELECT c.id AS CustomerId, c.firstname, c.lastname, p.id AS ProductId, p.ProductTypeId, p.CustomerId AS ProductsCustomerId, p.Price, p.Title, p.Description, p.Quantity, pt.id AS PaymentTypeId, pt.AcctNumber, pt.Name, pt.CustomerId AS PaymentTypeCustomerId " +

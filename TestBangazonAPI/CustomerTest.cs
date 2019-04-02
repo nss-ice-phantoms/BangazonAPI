@@ -76,34 +76,48 @@ namespace TestBangazonAPI
         [Fact]
         public async Task Test_Modify_Customer()
         {
-            string newLastName = "Flaper";
 
             using (var client = new APIClientProvider().Client)
             {
-                int alterThisId = 7;
+                var customerGetInitialResponse = await client.GetAsync("api/customers");
 
-                Customer modifyCustomer = new Customer
-                {
-                    FirstName = "Hernando",
-                    LastName = newLastName
-                };
+                string initialResponseBody = await customerGetInitialResponse.Content.ReadAsStringAsync();
 
-                var modifiedCustomAsJson = JsonConvert.SerializeObject(modifyCustomer);
+                var customerList = JsonConvert.DeserializeObject<List<Customer>>(initialResponseBody);
 
-                var response = await client.PutAsync($"api/customers/{alterThisId}",
+                Assert.Equal(HttpStatusCode.OK, customerGetInitialResponse.StatusCode);
+
+                var customerObject = customerList[0];
+
+                var defaultCustomerLastName = customerObject.LastName;
+
+                //PUT TEST BEGINS 
+                customerObject.LastName = "newName";
+
+                var modifiedCustomAsJson = JsonConvert.SerializeObject(customerObject);
+
+                var response = await client.PutAsync($"api/customers/{customerObject.Id}",
                     new StringContent(modifiedCustomAsJson, Encoding.UTF8, "application/json"));
 
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-                var getCustomer = await client.GetAsync($"api/customers/{alterThisId}");
+                var getCustomer = await client.GetAsync($"api/customers/{customerObject.Id}");
                 getCustomer.EnsureSuccessStatusCode();
 
                 string getCustomerBody = await getCustomer.Content.ReadAsStringAsync();
                 Customer newCustomer = JsonConvert.DeserializeObject<Customer>(getCustomerBody);
 
-                Assert.Equal(newLastName, newCustomer.LastName);
+                Assert.Equal("newName", newCustomer.LastName);
+                
+                newCustomer.LastName = defaultCustomerLastName;
+                var returnCustomerToDefault = JsonConvert.SerializeObject(newCustomer);
+
+                var putCustomerToDefault = await client.PutAsync($"api/customers/{customerObject.Id}",
+                    new StringContent(returnCustomerToDefault, Encoding.UTF8, "application/json"));
+                string originalCustomerObject = await response.Content.ReadAsStringAsync();
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             }
         }
     }
