@@ -75,8 +75,11 @@ namespace BangazonAPI.Controllers {
 
                 using (SqlCommand cmd = conn.CreateCommand()) {
 
-                    cmd.CommandText = $@"SELECT id, Name, Budget
-                                           FROM Department";
+                    cmd.CommandText = $@"SELECT d.id DeptId, d.Name AS DeptName, d.Budget AS Budget,
+                                                e.id AS EmployeeId, e.FirstName AS FirstName, e.LastName AS LastName,
+                                                e.DepartmentId as EmpDeptId
+                                           FROM Department d
+                                      LEFT JOIN Employee e ON e.DepartmentId = d.Id";
 
                     if (filter == "budget") {
                         cmd.CommandText += $@" WHERE Budget > {gt}";
@@ -88,39 +91,31 @@ namespace BangazonAPI.Controllers {
                     while (reader.Read()) {
 
                         Department department = new Department {
-                            Id = reader.GetInt32(reader.GetOrdinal("id")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            Id = reader.GetInt32(reader.GetOrdinal("DeptId")),
+                            Name = reader.GetString(reader.GetOrdinal("DeptName")),
                             Budget = reader.GetInt32(reader.GetOrdinal("Budget")),
                             Employees = new List<Employee>()
                         };
 
+                        if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId"))) {
+
+                            int employeeId = reader.GetInt32(reader.GetOrdinal("EmployeeId"));
+
+                            if (!department.Employees.Any(e => e.Id == employeeId)) {
+
+                                Employee employee = new Employee {
+                                    Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                    DepartmentId = reader.GetInt32(reader.GetOrdinal("EmpDeptId"))
+                                };
+
+                                department.Employees.Add(employee);
+                            }
+                        }
                         departments.Add(department);
                     }
-
                     reader.Close();
-
-                    foreach (Department department in departments) {
-
-                        cmd.CommandText = $@"SELECT e.id AS EmployeeId, e.FirstName AS FirstName, e.LastName AS LastName 
-                                               FROM Employee e
-                                          LEFT JOIN Department d on e.DepartmentId = d.Id
-                                              WHERE d.Id = {department.Id}";
-
-                        SqlDataReader reader2 = cmd.ExecuteReader();
-
-                        while (reader2.Read()) {
-
-                            Employee employee = new Employee {
-                                Id = reader2.GetInt32(reader2.GetOrdinal("EmployeeId")),
-                                FirstName = reader2.GetString(reader2.GetOrdinal("FirstName")),
-                                LastName = reader2.GetString(reader2.GetOrdinal("LastName"))
-                            };
-
-                            department.Employees.Add(employee);
-                        }
-
-                        reader2.Close();
-                    }
                 }
                 return Ok(departments);
             }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
 using BangazonAPI.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +26,7 @@ namespace BangazonAPI.Controllers {
 
         // GET: api/trainingprograms
         [HttpGet]
-        public IActionResult Get(string completed = "") {
+        public IActionResult Get(string _completed = "") {
 
             List<TrainingProgram> programs = new List<TrainingProgram>();
 
@@ -34,15 +35,23 @@ namespace BangazonAPI.Controllers {
 
             string commandText = "";
 
-            if (completed == "false") {
+            if (_completed == "false") {
 
-                commandText = $@"SELECT id, Name, StartDate, EndDate, MaxAttendees
-                                   FROM TrainingProgram
+                commandText = $@"SELECT tp.id AS ProgramId, tp.Name AS ProgramName, tp.StartDate AS StartDate, 
+                                        tp.EndDate AS EndDate, tp.MaxAttendees AS MaxAttendees, e.FirstName AS FirstName, 
+                                        e.LastName AS LastName, e.Id as EmployeeId, e.DepartmentId AS EmpDeptId
+                                   FROM TrainingProgram tp
+                              LEFT JOIN EmployeeTraining et ON et.TrainingProgramId = tp.Id
+                              LEFT JOIN Employee e ON et.EmployeeId = e.Id
                                    WHERE EndDate >= '{filterDate}'";
             } else {
 
-                commandText = $@"SELECT id, Name, StartDate, EndDate, MaxAttendees
-                                   FROM TrainingProgram";
+                commandText = @"SELECT tp.id AS ProgramId, tp.Name AS ProgramName, tp.StartDate AS StartDate, 
+                                        tp.EndDate AS EndDate, tp.MaxAttendees AS MaxAttendees, e.FirstName AS FirstName, 
+                                        e.LastName AS LastName, e.Id as EmployeeId, e.DepartmentId AS EmpDeptId
+                                   FROM TrainingProgram tp
+                              LEFT JOIN EmployeeTraining et ON et.TrainingProgramId = tp.Id
+                              LEFT JOIN Employee e ON et.EmployeeId = e.Id";
             }
 
             using (SqlConnection conn = Connection) {
@@ -58,16 +67,32 @@ namespace BangazonAPI.Controllers {
                     while (reader.Read()) {
 
                         TrainingProgram program = new TrainingProgram {
-                            Id = reader.GetInt32(reader.GetOrdinal("id")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            Id = reader.GetInt32(reader.GetOrdinal("ProgramId")),
+                            Name = reader.GetString(reader.GetOrdinal("ProgramName")),
                             StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
                             EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
-                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))};
+                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees")),
+                            Attendees = new List<Employee>()
+                        };
 
+                        if (!reader.IsDBNull(reader.GetOrdinal("ProgramId"))) {
+
+                            int employeeId = reader.GetInt32(reader.GetOrdinal("ProgramId"));
+
+                            if (!program.Attendees.Any(e => e.Id == employeeId)) {
+
+                                Employee employee = new Employee {
+                                    Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                    DepartmentId = reader.GetInt32(reader.GetOrdinal("EmpDeptId"))
+                                };
+
+                                program.Attendees.Add(employee);
+                            }
+                        }
                         programs.Add(program);
-
                     }
-
                     reader.Close();
                 }
                 return Ok(programs);
@@ -85,28 +110,52 @@ namespace BangazonAPI.Controllers {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand()) {
 
-                    cmd.CommandText = $@"SELECT id, Name, StartDate, EndDate, MaxAttendees
-                                           FROM TrainingProgram
-                                           WHERE id = @id";
+                    cmd.CommandText = $@"SELECT tp.id AS ProgramId, tp.Name AS ProgramName, tp.StartDate AS StartDate, 
+                                                tp.EndDate AS EndDate, tp.MaxAttendees AS MaxAttendees, e.FirstName AS FirstName, 
+                                                e.LastName AS LastName, e.Id as EmployeeId, e.DepartmentId AS EmpDeptId
+                                           FROM TrainingProgram tp
+                                      LEFT JOIN EmployeeTraining et ON et.TrainingProgramId = tp.Id
+                                      LEFT JOIN Employee e ON et.EmployeeId = e.Id
+                                          WHERE tp.Id = @id";
 
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    if (reader.Read()) {
+                    while (reader.Read()) {
 
-                        program = new TrainingProgram {
-                            Id = reader.GetInt32(reader.GetOrdinal("id")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
-                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
-                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))};
+                        if (program == null) {
+
+                            program = new TrainingProgram {
+                                Id = reader.GetInt32(reader.GetOrdinal("ProgramId")),
+                                Name = reader.GetString(reader.GetOrdinal("ProgramName")),
+                                StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                                EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                                MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees")),
+                                Attendees = new List<Employee>()
+                            };
+                        }
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("ProgramId"))) {
+
+                            int employeeId = reader.GetInt32(reader.GetOrdinal("ProgramId"));
+
+                            if (!program.Attendees.Any(e => e.Id == employeeId)) {
+
+                                Employee employee = new Employee {
+                                    Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                    DepartmentId = reader.GetInt32(reader.GetOrdinal("EmpDeptId"))
+                                };
+
+                                program.Attendees.Add(employee);
+                            }
+                        }
                     }
-
                     reader.Close();
                 }
                 return Ok(program);
             }
-
         }
 
         // POST api/trainingprograms
