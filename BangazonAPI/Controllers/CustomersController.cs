@@ -232,30 +232,95 @@ namespace BangazonAPI.Controllers
 
         //GET: api/customers/5
         [HttpGet("{id}", Name = "GetCustomer")]
-        public Customer Get(int id)
+        public IActionResult Get(int id, string _include)
         {
             using (SqlConnection conn = Connection)
             {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"SELECT c.id, c.firstname, c.lastname FROM Customer c WHERE c.id = @id";
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
-
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    Customer customer = null;
-                    if (reader.Read())
+                if (string.IsNullOrWhiteSpace(_include)) { 
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        customer = new Customer
+                        cmd.CommandText = @"SELECT c.id, c.firstname, c.lastname FROM Customer c WHERE c.id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                        SqlDataReader reader = cmd.ExecuteReader();
+
+                        Customer customer = null;
+                        if (reader.Read())
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("firstname")),
-                            LastName = reader.GetString(reader.GetOrdinal("lastname"))
-                        };
+                            customer = new Customer
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                FirstName = reader.GetString(reader.GetOrdinal("firstname")),
+                                LastName = reader.GetString(reader.GetOrdinal("lastname"))
+                            };
+                        }
+
+                        reader.Close();
+                        return Ok(customer);
                     }
-                    reader.Close();
-                    return customer;
+                }
+                else
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        if (_include == "payments") {
+
+
+                            cmd.CommandText =
+                                "SELECT c.id AS CustomerId, c.firstname, c.lastname, p.id AS ProductId, p.ProductTypeId, p.CustomerId AS ProductsCustomerId, p.Price, p.Title, p.Description, p.Quantity, pt.id AS PaymentTypeId, pt.AcctNumber, pt.Name, pt.CustomerId AS PaymentTypeCustomerId " +
+                                "FROM Customer c " +
+                                "LEFT JOIN Product p " +
+                                "ON c.id = p.CustomerId " +
+                                "LEFT JOIN PaymentType pt " +
+                                "ON c.id = pt.CustomerId " +
+                                @"WHERE c.id = @id; ";
+                            cmd.Parameters.Add(new SqlParameter("@id", id));
+                            SqlDataReader reader = cmd.ExecuteReader();
+
+                        Customer customer = null;
+
+                        while (reader.Read())
+                        {
+                            if (customer == null)
+                            {
+                                customer = new Customer
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName"))
+                                };
+                            }
+
+                            if (!reader.IsDBNull(reader.GetOrdinal("PaymentTypeId")))
+                            {
+                                int paymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId"));
+                                if (!customer.PaymentTypeList.Any(p => p.Id == paymentTypeId))
+                                {
+                                    PaymentType paymentType = new PaymentType
+                                    {
+                                        Id = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
+                                        AcctNumber = reader.GetInt32(reader.GetOrdinal("AcctNumber")),
+                                        Name = reader.GetString(reader.GetOrdinal("Name")),
+                                        CustomerId = reader.GetInt32(reader.GetOrdinal("PaymentTypeCustomerId"))
+                                    };
+                                    customer.PaymentTypeList.Add(paymentType);
+                                }
+                            }
+                        }
+
+                        reader.Close();
+                        return Ok(customer);
+                    } else if (_include == "products")
+                        {
+                            return NoContent();
+                        }
+                        else
+                        {
+                            return NoContent();
+                        }
+                }
                 }
             }
         }
