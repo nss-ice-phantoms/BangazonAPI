@@ -74,42 +74,69 @@ namespace TestBangazonAPI
             }
         }
 
+        [Fact]
+        public async Task Test_GetSingleType()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                var typeGetInitialResponse = await client.GetAsync("api/producttype");
+                string initialResponseBody = await typeGetInitialResponse.Content.ReadAsStringAsync();
+                var typeList = JsonConvert.DeserializeObject<List<ProductType>>(initialResponseBody);
+                Assert.Equal(HttpStatusCode.OK, typeGetInitialResponse.StatusCode);
+                var productTypeObject = typeList[0];
+                
+                //BEGIN GET SPECIFIC TESTING
+                var response = await client.GetAsync($"api/producttype/{productTypeObject.Id}");
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var productReturned = JsonConvert.DeserializeObject<ProductType>(responseBody);
+                
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.True(productReturned.Id == productTypeObject.Id);
+            }
+        }
+
         /*************
          * PUT Test
          ************/
         [Fact]
         public async Task Test_Modify_Product_Type()
         {
-            string newName = "Sports";
-            int alterThisId = 2;
-
             using (var client = new APIClientProvider().Client)
             {
+                var productTypeGetInitialResponse = await client.GetAsync("api/producttype");
+                string initialResponseBody = await productTypeGetInitialResponse.Content.ReadAsStringAsync();
+                var productTypeList = JsonConvert.DeserializeObject<List<ProductType>>(initialResponseBody);
+                Assert.Equal(HttpStatusCode.OK, productTypeGetInitialResponse.StatusCode);
+                
+                var productTypeObject = productTypeList[0];
+                var defaultProductTypeName = productTypeObject.Name;
+
                 /* PUT section */
-                ProductType modifiedType = new ProductType
-                {
-                    Name = newName
-                };
-                var modifiedStudentAsJSON = JsonConvert.SerializeObject(modifiedType);
+                productTypeObject.Name = "ThisIsATest";
 
-                var response = await client.PutAsync(
-                    $"/api/producttype/{alterThisId}",
-                    new StringContent(modifiedStudentAsJSON, Encoding.UTF8, "application/json")
-                );
+                var modifiedProductTypeAsJson = JsonConvert.SerializeObject(productTypeObject);
+                var response = await client.PutAsync($"api/producttype/{productTypeObject.Id}",
+                    new StringContent(modifiedProductTypeAsJson, Encoding.UTF8, "application/json"));
+
                 string responseBody = await response.Content.ReadAsStringAsync();
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+                var getProductType = await client.GetAsync($"api/producttype/{productTypeObject.Id}");
+                getProductType.EnsureSuccessStatusCode();
 
+                string getProductTypeBody = await getProductType.Content.ReadAsStringAsync();
+                ProductType newProductType = JsonConvert.DeserializeObject<ProductType>(getProductTypeBody);
+                Assert.Equal("ThisIsATest", newProductType.Name);
 
-                /* GET section - Verify that the PUT operation was successful */
-                var getType = await client.GetAsync($"/api/producttype/{alterThisId}");
-                getType.EnsureSuccessStatusCode();
+                newProductType.Name = defaultProductTypeName;
+                var returnProductTypeToDefault = JsonConvert.SerializeObject(newProductType);
 
-                string getTypeBody = await getType.Content.ReadAsStringAsync();
-                ProductType newType = JsonConvert.DeserializeObject<ProductType>(getTypeBody);
+                var putProductTypeToDefault = await client.PutAsync($"api/producttype/{newProductType.Id}",
+                    new StringContent(returnProductTypeToDefault, Encoding.UTF8, "application/json"));
 
-                Assert.Equal(HttpStatusCode.OK, getType.StatusCode);
-                Assert.Equal(newName, newType.Name);
+                string originalProductTypeObject = await response.Content.ReadAsStringAsync();
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                
             }
         }
 
@@ -117,23 +144,31 @@ namespace TestBangazonAPI
          * DELETE Test
          ************/
         [Fact]
-        public async Task Test_Delete_Product_Type()
+        public async Task Test_Remove_Product_Type()
         {
-            
             using (var client = new APIClientProvider().Client)
             {
+                var productTypeGetInitialResponse = await client.GetAsync("api/producttype");
+                string initialResponseBody = await productTypeGetInitialResponse.Content.ReadAsStringAsync();
+                var productTypeList = JsonConvert.DeserializeObject<List<ProductType>>(initialResponseBody);
+                Assert.Equal(HttpStatusCode.OK, productTypeGetInitialResponse.StatusCode);
 
-                int deleteThisId = 4;
+                int removeLastObject = productTypeList.Count - 1;
+                var productTypeObject = productTypeList[removeLastObject];
+                
+                var response = await client.DeleteAsync($"api/producttype/{productTypeObject.Id}");
+                string responseBody = await response.Content.ReadAsStringAsync();
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                
+                var getProductType = await client.GetAsync($"api/producttype/{productTypeObject.Id}");
+                getProductType.EnsureSuccessStatusCode();
 
-                /* DELETE section */
-                var response = await client.DeleteAsync($"/api/producttype/{deleteThisId}");
-                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-
-
-                /* GET section - Verify that the DELETE operation was successful */
-                var getType = await client.GetAsync("/api/producttype/1005");
-                Assert.Equal(HttpStatusCode.NoContent, getType.StatusCode);
+                string getProductTypeBody = await getProductType.Content.ReadAsStringAsync();
+                ProductType newProductType = JsonConvert.DeserializeObject<ProductType>(getProductTypeBody);
+                
+                Assert.Equal(HttpStatusCode.NoContent, getProductType.StatusCode);
             }
+
         }
 
     }

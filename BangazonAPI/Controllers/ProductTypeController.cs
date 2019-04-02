@@ -72,7 +72,7 @@ namespace BangazonAPI.Controllers
         }
 
         /***************************
-         * GET SINGLE PEODUCT TYPE
+         * GET SINGLE PRODUCT TYPE
         ****************************/
         // GET api/producttype/5
         [HttpGet("{id}", Name = "GetProductType")]
@@ -154,7 +154,7 @@ namespace BangazonAPI.Controllers
                         int rowsAffected = cmd.ExecuteNonQuery();
                         if (rowsAffected > 0)
                         {
-                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                            return new StatusCodeResult(StatusCodes.Status200OK);
                         }
                         throw new Exception("No rows affected");
                     }
@@ -193,7 +193,7 @@ namespace BangazonAPI.Controllers
                         int rowsAffected = cmd.ExecuteNonQuery();
                         if (rowsAffected > 0)
                         {
-                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                            return new StatusCodeResult(StatusCodes.Status200OK);
                         }
                         throw new Exception("No rows affected");
                     }
