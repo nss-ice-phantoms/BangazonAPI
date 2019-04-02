@@ -80,8 +80,8 @@ namespace TestBangazonAPI
         [Fact]
         public async Task Test_Modify_Product_Type()
         {
-            // New cohort Id to change to and test
             string newName = "Sports";
+            int alterThisId = 2;
 
             using (var client = new APIClientProvider().Client)
             {
@@ -93,7 +93,7 @@ namespace TestBangazonAPI
                 var modifiedStudentAsJSON = JsonConvert.SerializeObject(modifiedType);
 
                 var response = await client.PutAsync(
-                    "/api/producttype/2",
+                    $"/api/producttype/{alterThisId}",
                     new StringContent(modifiedStudentAsJSON, Encoding.UTF8, "application/json")
                 );
                 string responseBody = await response.Content.ReadAsStringAsync();
@@ -102,7 +102,7 @@ namespace TestBangazonAPI
 
 
                 /* GET section - Verify that the PUT operation was successful */
-                var getType = await client.GetAsync("/api/producttype/2");
+                var getType = await client.GetAsync($"/api/producttype/{alterThisId}");
                 getType.EnsureSuccessStatusCode();
 
                 string getTypeBody = await getType.Content.ReadAsStringAsync();
@@ -119,11 +119,14 @@ namespace TestBangazonAPI
         [Fact]
         public async Task Test_Delete_Product_Type()
         {
-
+            
             using (var client = new APIClientProvider().Client)
             {
+
+                int deleteThisId = 4;
+
                 /* DELETE section */
-                var response = await client.DeleteAsync("/api/producttype/1005");
+                var response = await client.DeleteAsync($"/api/producttype/{deleteThisId}");
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
 
