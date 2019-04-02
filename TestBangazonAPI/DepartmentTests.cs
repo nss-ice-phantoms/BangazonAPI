@@ -11,7 +11,7 @@ namespace TestBangazonAPI {
 
     public class DepartmentTests {
 
-        public int testDeptId = 6;
+        public int testDeptId;
 
         [Fact]
         public async Task TestGetDepartments() {

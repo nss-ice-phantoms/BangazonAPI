@@ -12,7 +12,7 @@ namespace TestBangazonAPI {
 
     public class TrainingProgramTests {
 
-        public int testTrainingProgramId = 4;
+        public int testTrainingProgramId;
 
         [Fact]
         public async Task TestGetTrainingPrograms() {
