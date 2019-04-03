@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Author: Megan Cruzen
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -17,6 +19,8 @@ namespace BangazonAPI.Models
         public int PaymentTypeId { get; set; }
 
         public List<Product> ProductList { get; set; } = new List<Product>();
-        public List<Customer> CustomerList { get; set; } = new List<Customer>();
+        public List<Customer> Customer { get; set; } = new List<Customer>();
+
+        //public Customer Customer { get; set; }
     }
 }
