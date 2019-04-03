@@ -7,15 +7,15 @@ a single-page application webpage and its data is tracked through a powerful, ha
 - Entity Relationship Diagram
 - Database Setup
 - Http Request Methods:
-1. Customer
-1. Product
-1. Payment Type
-1. Order
-1. Product Type
-1. Employee
-1. Department
-1. Computer
-1. Training Program
+1. Customers
+1. Products
+1. Payment Types
+1. Orders
+1. Product Types
+1. Employees
+1. Departments
+1. Computers
+1. Training Programs
 
 
 ## Software Requirements
@@ -32,9 +32,9 @@ a single-page application webpage and its data is tracked through a powerful, ha
 
 ## Http Request Methods
 
-### 1. CUSTOMER
+## 1. CUSTOMERS
 
-**GET**
+### GET
 
 * select `GET` then paste `localhost:5000/customers` into the field and click send. The result should be an array of all the orders in the database.
 
@@ -54,7 +54,7 @@ a single-page application webpage and its data is tracked through a powerful, ha
 
 * select `GET` then paste `localhost:5000/customers/2?_active=true` into the field and click send.  The result should be an array of customers that currently have active orders.
 
-**POST**
+### POST
 
 select `POST` then paste `localhost:5000/customers` into the field, then click Body underneath the field, then select raw, and then paste this snippet or make one similar
 
@@ -66,7 +66,7 @@ select `POST` then paste `localhost:5000/customers` into the field, then click B
 ```
 then click send. The result should be the new customer you made.
 
-**PUT**
+### PUT
 
 select `PUT` then paste `localhost:5000/customers` or any other `Customer Id`, then click Body underneath the field, then select raw, and then paste this snippet or make one similar
 ```
@@ -78,11 +78,11 @@ select `PUT` then paste `localhost:5000/customers` or any other `Customer Id`, t
 
 You should get nothing back from this. When you run the `GET` query the Customer you specified in your `PUT` query should show the updated, edited information you gave it.
 
-### 2. PAYMENT TYPES
+## 2. PAYMENT TYPES
 
 Use the command `dotnet run` to start the program, BangazonAPI. Once the program is running, open up the Postman desktop app and run the following commands for each request method:
 
-**GET**
+### GET
 
 To GET all product types, select GET in Postman then paste `localhost:5000/PaymentTypes` into the field and click send. The result should be an array of all the payment type in the database that should look like:
 
@@ -123,7 +123,7 @@ To GET a specific, single payment type, add an /{id} to the end of the `localhos
 ]
 ```
 
-**POST**
+### POST
 
 To POST a new object to your existing array for PaymentType, select POST, then paste `localhost:5000/PaymentTypes` into the field. Then click Body underneath the field, select raw, and then paste this below snippet or make one similar then click send. The result should be the new PaymentType you made:
 
@@ -132,7 +132,7 @@ To POST a new object to your existing array for PaymentType, select POST, then p
 	"paymentTypeName": "New Value"
 }
 ```
-**PUT**
+### PUT
 
 To update an existing PaymentType, select PUT then paste `localhost:5000/paymentTypes/2` or any other existing order. Then follow the same directions as the POST example, and change the values then click send:
 ```
@@ -142,15 +142,15 @@ To update an existing PaymentType, select PUT then paste `localhost:5000/payment
 ```
 You should get nothing back from this besides an OK status. When you run the GET query the computer you specified in your PUT query should show the updated, edited information you gave it.
 
-**DELETE**
+### DELETE
 
 To DELETE an existing product type, select DELETE then paste `localhost:5000/PaymentTypes/2` or any other existing PaymentType then click send. You should get nothing back from this besides an OK status. When you run the GET query the order with the Id you specified in your DELETE query should no longer exist.
 
-### 3. PRODUCT
+## 3. PRODUCTS
 
 Use the command `dotnet run` to start the program, BangazonAPI. Once the program is running, open up the Postman desktop app and run the following commands for each request method:
 
-**GET**
+### GET
 
 To GET all product types, select GET in Postman then paste `localhost:5000/Products` into the field and click send. The result should be an array of all the products in the database that should look like:
 
@@ -200,7 +200,7 @@ To GET a specific, single product type, add an /{id} to the end of the l`ocalhos
 }
 ]
 ```
-**POST**
+### POST
 
 To POST a new object to your existing array for Product, select POST, then paste `localhost:5000/Products` into the field. Then click Body underneath the field, select raw, and then paste this below snippet or make one similar then click send. The result should be the new Product you made:
 
@@ -209,7 +209,7 @@ To POST a new object to your existing array for Product, select POST, then paste
 	"Product": "New Value"
 }
 ```
-**PUT**
+### PUT
 
 To update an existing PaymentType, select PUT then paste `localhost:5000/products/2` or any other existing order. Then follow the same directions as the POST example, and change the values then click send:
 ```
@@ -219,13 +219,13 @@ To update an existing PaymentType, select PUT then paste `localhost:5000/product
 ```
 You should get nothing back from this besides an OK status. When you run the GET query the computer you specified in your PUT query should show the updated, edited information you gave it.
 
-**DELETE**
+### DELETE
 
 To DELETE an existing product type, select DELETE then paste `localhost:5000/products/2` or any other existing product then click send. You should get nothing back from this besides an OK status. When you run the GET query the order with the Id you specified in your DELETE query should no longer exist.
 
-### 4. Order
+## 4. Orders
 
-**GET**
+### GET
 
 To GET all Orders, select GET in Postman, then input `localhost:5000/orders` into the field and click Send. The result should be an array of all the Orders in the database.
 
@@ -237,7 +237,7 @@ Query Parameters:
 - To see all completed orders, add `?_completed=true` to the URL.
 - To see all uncomplete orders, add `?_completed=false` to the URL.
 
-**POST**
+### POST
 
 To POST a new Order object, select POST in Postman, then input `localhost:5000/orders` into the field. Then click Body, select Raw, paste in the snippet below, and click Send. The result should be the new Order you made.
 
@@ -247,7 +247,7 @@ To POST a new Order object, select POST in Postman, then input `localhost:5000/o
 }
 ```
 
-**PUT**
+### PUT
 
 To update an existing order, select PUT, then input `localhost:5000/order/2` or the Id of another existing order. Then click Body, select Raw, paste in the snippet below, and click Send.
 
@@ -259,15 +259,15 @@ To update an existing order, select PUT, then input `localhost:5000/order/2` or 
 
 This should result in a "200 OK" status. You can run another GET query to see the item you updated.
 
-**DELETE**
+### DELETE
 
 To DELETE an existing Order, select DELETE, then input `localhost:5000/orders/3` or the Id of another existing Order and click Send. You should get a "200 OK" status. If you run a GET query using the Id you specified in your DELETE query, that item should no longer exist.
 
-### 5. Product Type
+## 5. Product Types
 
 Use the command `dotnet run` to start the program, BangazonAPI. Once the program is running, open up the Postman desktop app and run the following commands for each request method:
 
-**GET**
+### GET
 
 To GET all ProductTypes, select GET in Postman, then input `localhost:5000/producttype` into the field and click Send. The result should be an array of all ProductTypes in the database that should look like this:
 
@@ -299,7 +299,7 @@ To GET a specific ProductType, add an Id to the end of the `localhost:5000/produ
 ]
 ```
 
-**POST**
+### POST
 
 To POST a new object to your existing array for ProductType, select POST, then input `localhost:5000/producttype` into the field. Then click Body, select Raw, paste in the snippet below, and click Send. The result should be the new ProductType you made:
 
@@ -309,7 +309,7 @@ To POST a new object to your existing array for ProductType, select POST, then i
 }
 ```
 
-**PUT**
+### PUT
 
 To update an existing ProductType, select PUT, then input `localhost:5000/producttype/2` or the Id of another existing ProductType. Then click Body, select Raw, paste in the snippet below, and click Send. 
 
@@ -322,47 +322,47 @@ To update an existing ProductType, select PUT, then input `localhost:5000/produc
 
 This should result in a "200 OK" status. You can run another GET query to see the item you updated.
 
-**DELETE**
+### DELETE
 
 To DELETE an existing ProductType, select DELETE, then input `localhost:5000/producttype/4` or the Id of another existing ProductType and click Send. You should get a "200 OK" status. If you run a GET query using the Id you specified in your DELETE query, that item should no longer exist.
 
 
-### 6. Employee
+## 6. Employees
 
-**GET**
+### GET
 
-**POST**
+### POST
 
-**PUT**
+### PUT
 
-**DELETE**
+### DELETE
 
-### 7. Department
+## 7. Departments
 
-**GET**
+### GET
 
-**POST**
+### POST
 
-**PUT**
+### PUT
 
-**DELETE**
+### DELETE
 
-### 8. Computer
+## 8. Computers
 
-**GET**
+### GET
 
-**POST**
+### POST
 
-**PUT**
+### PUT
 
-**DELETE**
+### DELETE
 
-### 9. Training Program
+## 9. Training Programs
 
-**GET**
+### GET
 
-**POST**
+### POST
 
-**PUT**
+### PUT
 
-**DELETE**
+### DELETE
