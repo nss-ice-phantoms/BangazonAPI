@@ -38,52 +38,30 @@ namespace BangazonAPI.Controllers
 
         // GET api/order
         [HttpGet(Name = "GetAllOrders")]
-        public List<Order> GetAllOrders(string include)
+        public List<Order> GetAllOrders(string _include)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    //cmd.CommandText = "SELECT o.Id as OrderId, pt.[Name] as PaymentType";
+                    cmd.CommandText = "SELECT o.Id as OrderId, o.CustomerId, o.PaymentTypeId, pt.[Name] as PaymentType";
 
-                    //if (include == "products")
-                    //{
-                    //    cmd.CommandText += ", p.Id AS ProductId, p.Title AS ProductTitle, p.[Description]";
-                    //}
-
-                    //if (include == "customers")
-                    //{
-                    //    cmd.CommandText += ", c.Id AS CustomerId, c.FirstName, c.LastName";
-                    //}
-
-                    //cmd.CommandText += @" FROM [Order] o
-                    //                    INNER JOIN PaymentType pt ON pt.Id = o.PaymentTypeId
-                    //                    INNER JOIN Customer c ON c.Id = o.CustomerId
-                    //                    INNER JOIN OrderProduct op ON op.OrderId = o.Id
-                    //                    INNER JOIN Product p ON p.Id = op.ProductId";
-
-                    if (include == "products")
+                    if (_include == "products")
                     {
-                        cmd.CommandText = @"SELECT o.Id AS OrderId, o.CustomerId, o.PaymentTypeId, pt.[Name] AS PaymentType, p.Id AS ProductId, p.Title AS ProductTitle, p.[Description]
-                                            FROM [Order] o
-                                            INNER JOIN PaymentType pt ON pt.Id = o.PaymentTypeId
-                                            INNER JOIN OrderProduct op ON op.OrderId = o.Id
-                                            INNER JOIN Product p ON p.Id = op.ProductId";
+                        cmd.CommandText += ", p.Id AS ProductId, p.Title AS ProductTitle, p.[Description]";
                     }
-                    if (include == "customers")
+
+                    if (_include == "customers")
                     {
-                        cmd.CommandText = @"SELECT o.Id AS OrderId, o.CustomerId, o.PaymentTypeId, pt.[Name] AS PaymentType, c.Id AS CustomerId, c.FirstName, c.LastName
-                                            FROM [Order] o
-                                            INNER JOIN PaymentType pt ON pt.Id = o.PaymentTypeId
-                                            INNER JOIN Customer c ON c.Id = o.CustomerId";
+                        cmd.CommandText += ", c.Id AS CustomerId, c.FirstName, c.LastName";
                     }
-                    if (include != "customers" && include != "products")
-                    {
-                        cmd.CommandText = @"SELECT o.Id as OrderId, o.CustomerId, o.PaymentTypeId, pt.[Name] as PaymentType
-                                            FROM [Order] o
-                                            INNER JOIN PaymentType pt ON pt.Id = o.PaymentTypeId";
-                    }
+
+                    cmd.CommandText += @" FROM [Order] o
+                                        LEFT JOIN PaymentType pt ON pt.Id = o.PaymentTypeId
+                                        LEFT JOIN Customer c ON c.Id = o.CustomerId
+                                        LEFT JOIN OrderProduct op ON op.OrderId = o.Id
+                                        LEFT JOIN Product p ON p.Id = op.ProductId";
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -96,14 +74,13 @@ namespace BangazonAPI.Controllers
                             Order newOrder = new Order
                             {
                                 Id = orderId,
-                                CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
-                                PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId"))
+                                CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId"))
                             };
 
                             orders.Add(orderId, newOrder);
                         }
 
-                        if (include == "products")
+                        if (_include == "products")
                         {
                             if (!reader.IsDBNull(reader.GetOrdinal("ProductId")))
                             {
@@ -119,7 +96,7 @@ namespace BangazonAPI.Controllers
                             }
                         }
 
-                        if (include == "customers")
+                        if (_include == "customers")
                         {
                             if (!reader.IsDBNull(reader.GetOrdinal("CustomerId")))
                             {
@@ -148,36 +125,53 @@ namespace BangazonAPI.Controllers
         ********************/
         // GET api/order/5
         [HttpGet("{id}", Name = "GetOrder")]
-        public Order Get(int id, string include)
+        public Order Get(int id, string _include)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    if (include == "products")
+                    //if (include == "products")
+                    //{
+                    //    cmd.CommandText = @"SELECT o.Id AS OrderId, o.CustomerId, o.PaymentTypeId, pt.[Name] AS PaymentType, p.Id AS ProductId, p.Title AS ProductTitle, p.[Description]
+                    //                        FROM [Order] o
+                    //                        INNER JOIN PaymentType pt ON pt.Id = o.PaymentTypeId
+                    //                        INNER JOIN OrderProduct op ON op.OrderId = o.Id
+                    //                        INNER JOIN Product p ON p.Id = op.ProductId";
+                    //}
+                    //if (_include == "customers" || _include == "customer")
+                    //{
+                    //    cmd.CommandText = @"SELECT o.Id AS OrderId, o.CustomerId, o.PaymentTypeId, pt.[Name] AS PaymentType, c.Id AS CustomerId, c.FirstName, c.LastName
+                    //                        FROM [Order] o
+                    //                        INNER JOIN PaymentType pt ON pt.Id = o.PaymentTypeId
+                    //                        INNER JOIN Customer c ON c.Id = o.CustomerId";
+                    //}
+                    //if (_include == "")
+                    //{
+                    //    cmd.CommandText = @"SELECT o.Id as OrderId, o.CustomerId, o.PaymentTypeId, pt.[Name] as PaymentType
+                    //                        FROM [Order] o
+                    //                        INNER JOIN PaymentType pt ON pt.Id = o.PaymentTypeId";
+                    //}
+
+                    cmd.CommandText = "SELECT o.Id as OrderId, o.CustomerId, o.PaymentTypeId, pt.[Name] as PaymentType";
+
+                    if (_include == "products")
                     {
-                        cmd.CommandText = @"SELECT o.Id AS OrderId, o.CustomerId, o.PaymentTypeId, pt.[Name] AS PaymentType, p.Id AS ProductId, p.Title AS ProductTitle, p.[Description]
-                                            FROM [Order] o
-                                            INNER JOIN PaymentType pt ON pt.Id = o.PaymentTypeId
-                                            INNER JOIN OrderProduct op ON op.OrderId = o.Id
-                                            INNER JOIN Product p ON p.Id = op.ProductId";
-                    }
-                    if (include == "customers" || include == "customer")
-                    {
-                        cmd.CommandText = @"SELECT o.Id AS OrderId, o.CustomerId, o.PaymentTypeId, pt.[Name] AS PaymentType, c.Id AS CustomerId, c.FirstName, c.LastName
-                                            FROM [Order] o
-                                            INNER JOIN PaymentType pt ON pt.Id = o.PaymentTypeId
-                                            INNER JOIN Customer c ON c.Id = o.CustomerId";
-                    }
-                    if (include == null)
-                    {
-                        cmd.CommandText = @"SELECT o.Id as OrderId, o.CustomerId, o.PaymentTypeId, pt.[Name] as PaymentType
-                                            FROM [Order] o
-                                            INNER JOIN PaymentType pt ON pt.Id = o.PaymentTypeId";
+                        cmd.CommandText += ", p.Id AS ProductId, p.Title AS ProductTitle, p.[Description]";
                     }
 
-                    cmd.CommandText += " WHERE o.Id = @id";
+                    if (_include == "customers" || _include == "customer")
+                    {
+                        cmd.CommandText += ", c.Id AS CustomerId, c.FirstName, c.LastName";
+                    }
+
+                    cmd.CommandText += @" FROM [Order] o
+                                        INNER JOIN PaymentType pt ON pt.Id = o.PaymentTypeId
+                                        INNER JOIN Customer c ON c.Id = o.CustomerId
+                                        INNER JOIN OrderProduct op ON op.OrderId = o.Id
+                                        INNER JOIN Product p ON p.Id = op.ProductId
+                                        WHERE o.Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -196,7 +190,7 @@ namespace BangazonAPI.Controllers
                             };
                         }
 
-                        if (include == "products")
+                        if (_include == "products")
                         {
                             if (!reader.IsDBNull(reader.GetOrdinal("ProductId")))
                             {
@@ -211,7 +205,7 @@ namespace BangazonAPI.Controllers
                             }
                         }
 
-                        if (include == "customers" || include == "customer")
+                        if (_include == "customers" || _include == "customer")
                         {
                             if (!reader.IsDBNull(reader.GetOrdinal("CustomerId")))
                             {
@@ -246,11 +240,11 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO [Order] (CustomerId, PaymentTypeId)
+                    cmd.CommandText = @"INSERT INTO [Order] (CustomerId)
                                         OUTPUT INSERTED.Id
-                                        VALUES (@customerId, @paymentId)";
+                                        VALUES (@customerId)";
                     cmd.Parameters.Add(new SqlParameter("@customerId", newOrder.CustomerId));
-                    cmd.Parameters.Add(new SqlParameter("@paymentId", newOrder.PaymentTypeId));
+                    //cmd.Parameters.Add(new SqlParameter("@paymentId", newOrder.PaymentTypeId));
 
                     int newId = (int)cmd.ExecuteScalar(); 
                     newOrder.Id = newId;
