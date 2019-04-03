@@ -33,16 +33,31 @@ namespace BangazonAPI.Controllers
 
         //GET: api/customers
         [HttpGet]
-        public IActionResult Get(string _include, string q)
+        public IActionResult Get(string _include, string q, string _active)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
+                    
                     if (string.IsNullOrWhiteSpace(_include))
                     {
-                        cmd.CommandText = "SELECT c.id, c.firstname, c.lastname FROM Customer c";
+                        if (_active == "false")
+                        {
+                            cmd.CommandText = "SELECT ID, FirstName, LastName " +
+                                              "FROM customer " +
+                                              "WHERE ID NOT IN(SELECT customerId FROM[order])";
+                        } else if (_active == "true")
+                        {
+                            cmd.CommandText = "SELECT ID, FirstName, LastName " +
+                                              "FROM customer " +
+                                              "WHERE ID IN(SELECT customerId FROM[order])";
+                        }
+                        else
+                        {
+                            cmd.CommandText = "SELECT c.id, c.firstname, c.lastname FROM Customer c";
+                        }
 
                         //CONDITIONAL STATEMENT FOR q-search-----
                         if (!string.IsNullOrWhiteSpace(q))
