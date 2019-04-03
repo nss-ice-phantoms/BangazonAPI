@@ -37,6 +37,27 @@ namespace TestBangazonAPI
             }
         }
 
+        [Fact]
+        public async Task Test_GetSingleType()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                var typeGetInitialResponse = await client.GetAsync("api/producttype");
+                string initialResponseBody = await typeGetInitialResponse.Content.ReadAsStringAsync();
+                var typeList = JsonConvert.DeserializeObject<List<ProductType>>(initialResponseBody);
+                Assert.Equal(HttpStatusCode.OK, typeGetInitialResponse.StatusCode);
+                var productTypeObject = typeList[0];
+
+                //BEGIN GET SPECIFIC TESTING
+                var response = await client.GetAsync($"api/producttype/{productTypeObject.Id}");
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var productReturned = JsonConvert.DeserializeObject<ProductType>(responseBody);
+
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.True(productReturned.Id == productTypeObject.Id);
+            }
+        }
+
 
         /*************
          * POST Test
@@ -74,26 +95,6 @@ namespace TestBangazonAPI
             }
         }
 
-        [Fact]
-        public async Task Test_GetSingleType()
-        {
-            using (var client = new APIClientProvider().Client)
-            {
-                var typeGetInitialResponse = await client.GetAsync("api/producttype");
-                string initialResponseBody = await typeGetInitialResponse.Content.ReadAsStringAsync();
-                var typeList = JsonConvert.DeserializeObject<List<ProductType>>(initialResponseBody);
-                Assert.Equal(HttpStatusCode.OK, typeGetInitialResponse.StatusCode);
-                var productTypeObject = typeList[0];
-                
-                //BEGIN GET SPECIFIC TESTING
-                var response = await client.GetAsync($"api/producttype/{productTypeObject.Id}");
-                string responseBody = await response.Content.ReadAsStringAsync();
-                var productReturned = JsonConvert.DeserializeObject<ProductType>(responseBody);
-                
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.True(productReturned.Id == productTypeObject.Id);
-            }
-        }
 
         /*************
          * PUT Test
