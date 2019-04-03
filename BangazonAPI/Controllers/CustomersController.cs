@@ -33,7 +33,7 @@ namespace BangazonAPI.Controllers
 
         //GET: api/customers
         [HttpGet]
-        public IActionResult Get(string _include, string q, bool active)
+        public IActionResult Get(string _include, string q, string _active)
         {
             using (SqlConnection conn = Connection)
             {
@@ -43,11 +43,11 @@ namespace BangazonAPI.Controllers
                     
                     if (string.IsNullOrWhiteSpace(_include))
                     {
-                        if (!active)
+                        if (_active == "false")
                         {
                             cmd.CommandText = "SELECT ID, FirstName, LastName " +
                                               "FROM customer " +
-                                              "WHERE ID NOT IN(SELECT ID FROM[order])";
+                                              "WHERE ID NOT IN(SELECT customerId FROM[order])";
                         }
                         else
                         {
