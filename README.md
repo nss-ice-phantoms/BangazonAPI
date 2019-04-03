@@ -32,7 +32,7 @@ a single-page application webpage and its data is tracked through a powerful, ha
 
 ## Http Request Methods
 
-### 1. Customer
+### 1. CUSTOMER
 
 **GET**
 
@@ -45,6 +45,14 @@ a single-page application webpage and its data is tracked through a powerful, ha
 * select `GET` then paste `localhost:5000/customers/?q=bo` into he field and click send. The result should be an array of all the customers in the database with first or last names that contains sat.
 
 * select `GET` then paste `localhost:5000/customers/1` or any other number that showed up in the previous query as CustomerId and click send. The result should be only that object of the specified Customer
+
+* select `GET` then paste `localhost:5000/customers/2?_include=payments` into the field and click send. The result should be a specific customer in the database with all of the payment types included to that customer as well.
+
+* select `GET` then paste `localhost:5000/customers/2?_include=products` into the field and click send. The result should be a specific customer in the database with all of the products types included to that customer as well.
+
+* select `GET` then paste `localhost:5000/customers/2?_active=false` into the field and click send.  The result should be an array of customers that do not have active orders.
+
+* select `GET` then paste `localhost:5000/customers/2?_active=true` into the field and click send.  The result should be an array of customers that currently have active orders.
 
 **POST**
 
@@ -70,7 +78,8 @@ select `PUT` then paste `localhost:5000/customers` or any other `Customer Id`, t
 
 You should get nothing back from this. When you run the `GET` query the Customer you specified in your `PUT` query should show the updated, edited information you gave it.
 
-### 2. Payment Types
+### 2. PAYMENT TYPES
+
 Use the command `dotnet run` to start the program, BangazonAPI. Once the program is running, open up the Postman desktop app and run the following commands for each request method:
 
 **GET**
@@ -137,7 +146,8 @@ You should get nothing back from this besides an OK status. When you run the GET
 
 To DELETE an existing product type, select DELETE then paste `localhost:5000/PaymentTypes/2` or any other existing PaymentType then click send. You should get nothing back from this besides an OK status. When you run the GET query the order with the Id you specified in your DELETE query should no longer exist.
 
-### 3. Product
+### 3. PRODUCT
+
 Use the command `dotnet run` to start the program, BangazonAPI. Once the program is running, open up the Postman desktop app and run the following commands for each request method:
 
 **GET**
