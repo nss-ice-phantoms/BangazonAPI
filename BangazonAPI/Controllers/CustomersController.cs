@@ -48,6 +48,11 @@ namespace BangazonAPI.Controllers
                             cmd.CommandText = "SELECT ID, FirstName, LastName " +
                                               "FROM customer " +
                                               "WHERE ID NOT IN(SELECT customerId FROM[order])";
+                        } else if (_active == "true")
+                        {
+                            cmd.CommandText = "SELECT ID, FirstName, LastName " +
+                                              "FROM customer " +
+                                              "WHERE ID IN(SELECT customerId FROM[order])";
                         }
                         else
                         {
