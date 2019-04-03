@@ -56,7 +56,7 @@ a single-page application webpage and its data is tracked through a powerful, ha
 
 **POST**
 
-select `POST` then paste `localhost:5000/customers`into the field, then click Body underneath the field, then select raw, and then paste this snippet or make one similar
+select `POST` then paste `localhost:5000/customers` into the field, then click Body underneath the field, then select raw, and then paste this snippet or make one similar
 
 ```
 {
@@ -109,7 +109,7 @@ To GET all product types, select GET in Postman then paste `localhost:5000/Payme
 ]
 ```
 
-To GET a specific, single payment type, add an /{id} to the end of the l`ocalhost:5000/PaymentTypes` URL. The result should only include the single payment type with the Id you added like the below:
+To GET a specific, single payment type, add an /{id} to the end of the `localhost:5000/PaymentTypes` URL. The result should only include the single payment type with the Id you added like the below:
 
 
 ```
@@ -227,11 +227,41 @@ To DELETE an existing product type, select DELETE then paste `localhost:5000/pro
 
 **GET**
 
+To GET all Orders, select GET in Postman, then input `localhost:5000/orders` into the field and click Send. The result should be an array of all the Orders in the database.
+
+To GET a single order, add an Id to the end of the `localhost:5000/orders` URL, e.g. `localhost:5000/orders/2`. The result should only include the single order with the Id you queried.
+
+Query Parameters:
+- To return a list of products in each order, add `?_include=products` to the URL.
+- To return the name of the customer for each order, add `?_include=customers` to the URL.
+- To see all completed orders, add `?_completed=true` to the URL.
+- To see all uncomplete orders, add `?_completed=false` to the URL.
+
 **POST**
+
+To POST a new Order object, select POST in Postman, then input `localhost:5000/orders` into the field. Then click Body, select Raw, paste in the snippet below, and click Send. The result should be the new Order you made.
+
+```
+{
+   "CustomerId": 2
+}
+```
 
 **PUT**
 
+To update an existing order, select PUT, then input `localhost:5000/order/2` or the Id of another existing order. Then click Body, select Raw, paste in the snippet below, and click Send.
+
+```
+{
+   "PaymentTypeId": 1
+}
+```
+
+This should result in a "200 OK" status. You can run another GET query to see the item you updated.
+
 **DELETE**
+
+To DELETE an existing Order, select DELETE, then input `localhost:5000/orders/3` or the Id of another existing Order and click Send. You should get a "200 OK" status. If you run a GET query using the Id you specified in your DELETE query, that item should no longer exist.
 
 ### 5. Product Type
 
