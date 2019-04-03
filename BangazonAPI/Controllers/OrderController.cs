@@ -12,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace BangazonAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/orders")]
     [ApiController]
     public class OrderController : ControllerBase
     {
@@ -36,9 +36,9 @@ namespace BangazonAPI.Controllers
          * GET ALL ORDERS
         ******************/
 
-        // GET api/order
+        // GET api/orders
         [HttpGet(Name = "GetAllOrders")]
-        public List<Order> GetAllOrders(string _include)
+        public List<Order> GetAllOrders(string _include, string _completed)
         {
             using (SqlConnection conn = Connection)
             {
@@ -46,7 +46,7 @@ namespace BangazonAPI.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = "SELECT o.Id as OrderId, o.CustomerId, o.PaymentTypeId, pt.[Name] as PaymentType";
-
+                    
                     if (_include == "products")
                     {
                         cmd.CommandText += ", p.Id AS ProductId, p.Title AS ProductTitle, p.[Description]";
@@ -58,10 +58,21 @@ namespace BangazonAPI.Controllers
                     }
 
                     cmd.CommandText += @" FROM [Order] o
-                                        LEFT JOIN PaymentType pt ON pt.Id = o.PaymentTypeId
                                         LEFT JOIN Customer c ON c.Id = o.CustomerId
                                         LEFT JOIN OrderProduct op ON op.OrderId = o.Id
-                                        LEFT JOIN Product p ON p.Id = op.ProductId";
+                                        LEFT JOIN Product p ON p.Id = op.ProductId
+                                        LEFT JOIN PaymentType pt ON pt.Id = o.PaymentTypeId
+                                        WHERE 1=1";
+
+                    if (_completed == "false")
+                    {
+                        cmd.CommandText += " AND PaymentTypeId IS NULL";
+                    }
+
+                    if (_completed == "true")
+                    {
+                        cmd.CommandText += " AND PaymentTypeId IS NOT NULL";
+                    }
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -71,13 +82,27 @@ namespace BangazonAPI.Controllers
                         int orderId = reader.GetInt32(reader.GetOrdinal("OrderId"));
                         if (!orders.ContainsKey(orderId))
                         {
-                            Order newOrder = new Order
+                            if (!reader.IsDBNull(reader.GetOrdinal("PaymentTypeId")))
                             {
-                                Id = orderId,
-                                CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId"))
-                            };
+                                Order newOrder = new Order
+                                {
+                                    Id = orderId,
+                                    CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                    PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId"))
+                                };
 
-                            orders.Add(orderId, newOrder);
+                                orders.Add(orderId, newOrder);
+                            }
+                            else
+                            {
+                                Order newOrder = new Order
+                                {
+                                    Id = orderId,
+                                    CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId"))
+                                };
+
+                                orders.Add(orderId, newOrder);
+                            }
                         }
 
                         if (_include == "products")
@@ -123,7 +148,7 @@ namespace BangazonAPI.Controllers
         /********************
          * GET SINGLE ORDER
         ********************/
-        // GET api/order/5
+        // GET api/orders/5
         [HttpGet("{id}", Name = "GetOrder")]
         public Order Get(int id, string _include)
         {
@@ -132,28 +157,6 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    //if (include == "products")
-                    //{
-                    //    cmd.CommandText = @"SELECT o.Id AS OrderId, o.CustomerId, o.PaymentTypeId, pt.[Name] AS PaymentType, p.Id AS ProductId, p.Title AS ProductTitle, p.[Description]
-                    //                        FROM [Order] o
-                    //                        INNER JOIN PaymentType pt ON pt.Id = o.PaymentTypeId
-                    //                        INNER JOIN OrderProduct op ON op.OrderId = o.Id
-                    //                        INNER JOIN Product p ON p.Id = op.ProductId";
-                    //}
-                    //if (_include == "customers" || _include == "customer")
-                    //{
-                    //    cmd.CommandText = @"SELECT o.Id AS OrderId, o.CustomerId, o.PaymentTypeId, pt.[Name] AS PaymentType, c.Id AS CustomerId, c.FirstName, c.LastName
-                    //                        FROM [Order] o
-                    //                        INNER JOIN PaymentType pt ON pt.Id = o.PaymentTypeId
-                    //                        INNER JOIN Customer c ON c.Id = o.CustomerId";
-                    //}
-                    //if (_include == "")
-                    //{
-                    //    cmd.CommandText = @"SELECT o.Id as OrderId, o.CustomerId, o.PaymentTypeId, pt.[Name] as PaymentType
-                    //                        FROM [Order] o
-                    //                        INNER JOIN PaymentType pt ON pt.Id = o.PaymentTypeId";
-                    //}
-
                     cmd.CommandText = "SELECT o.Id as OrderId, o.CustomerId, o.PaymentTypeId, pt.[Name] as PaymentType";
 
                     if (_include == "products")
@@ -256,7 +259,7 @@ namespace BangazonAPI.Controllers
         /**************
          * EDIT ORDER
         ***************/
-        // PUT api/order/5
+        // PUT api/orders/5
         [HttpPut("{id}")]
         public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Order order)
         {
@@ -277,7 +280,7 @@ namespace BangazonAPI.Controllers
                         int rowsAffected = cmd.ExecuteNonQuery();
                         if (rowsAffected > 0)
                         {
-                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                            return new StatusCodeResult(StatusCodes.Status200OK);
                         }
                         throw new Exception("No rows affected");
                     }
@@ -299,7 +302,7 @@ namespace BangazonAPI.Controllers
         /***************
          * DELETE ORDER
         ****************/
-        // DELETE api/order/5
+        // DELETE api/orders/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
@@ -310,13 +313,14 @@ namespace BangazonAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"DELETE FROM [Order] WHERE Id = @id";
+                        cmd.CommandText = @"DELETE FROM OrderProduct WHERE OrderId = @id
+                                            DELETE FROM [Order] WHERE Id = @id";
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         int rowsAffected = cmd.ExecuteNonQuery();
                         if (rowsAffected > 0)
                         {
-                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                            return new StatusCodeResult(StatusCodes.Status200OK);
                         }
                         throw new Exception("No rows affected");
                     }
