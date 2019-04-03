@@ -4,7 +4,7 @@
 
     // "http://localhost:5000/api"
 
-        let remoteURL = "http://localhost:5000/api"
+        let remoteURL = "http://bangazon.com/api"
         let dataSet = fetchObject.dataSet;
         let embedItem = fetchObject.embedItem;
         let fetchType = fetchObject.fetchType;
@@ -16,19 +16,19 @@
         switch (fetchType) {
 
             case "GET":
-                return fetch(`${remoteURL}/${dataSet}/${embedItem}`).then(r => r.json())
+                return fetch(`${remoteURL}/${dataSet}/${embedItem}`, {method: `${fetchType}`,mode: 'cors', headers: {"Content-Type": "application/json; charset=utf-8"}}).then(r => r.json())
 
             case "POST":
-                return fetch(`${remoteURL}/${dataSet}`, {method: `${fetchType}`,headers: {"Content-Type": "application/json; charset=utf-8",},body: JSON.stringify(dataBaseObject),}).then(r => r.json())
+                return fetch(`${remoteURL}/${dataSet}`, {method: `${fetchType}`,mode: 'cors',headers: {"Content-Type": "application/json; charset=utf-8"},body: JSON.stringify(dataBaseObject)}).then(r => r.json())
 
             case "PUT":
-                return fetch(`${remoteURL}/${dataSet}/${putId}`, {method: `${fetchType}`,headers: {"Content-Type": "application/json; charset=utf-8",},body: JSON.stringify(dataBaseObject),}).then(r => r.json())
+                return fetch(`${remoteURL}/${dataSet}/${putId}`, {method: `${fetchType}`,mode: 'cors',headers: {"Content-Type": "application/json; charset=utf-8"},body: JSON.stringify(dataBaseObject)}).then(r => r.json())
 
             case "DELETE":
-                return fetch(`${remoteURL}/${dataSet}/${deleteId}`, {method: `${fetchType}`,}).then(r => r.json())
+                return fetch(`${remoteURL}/${dataSet}/${deleteId}`, {method: `${fetchType}`,mode: 'cors',}).then(r => r.json())
 
             case "PATCH":
-                return fetch(`${remoteURL}/${dataSet}/${patchId}`, {method: `${fetchType}`,headers: {"Content-Type": "application/json; charset=utf-8",},body: JSON.stringify(dataBaseObject),}).then(r => r.json())
+                return fetch(`${remoteURL}/${dataSet}/${patchId}`, {method: `${fetchType}`,mode: 'cors',headers: {"Content-Type": "application/json; charset=utf-8"},body: JSON.stringify(dataBaseObject)}).then(r => r.json())
 
             default:
             break;
