@@ -125,7 +125,7 @@ namespace BangazonAPI.Controllers
 
                     int newId = (int)cmd.ExecuteScalar();
                     newType.Id = newId;
-                    return CreatedAtRoute("GetOrder", new { id = newId }, newType);
+                    return CreatedAtRoute("GetProductType", new { id = newId }, newType);
                 }
             }
         }

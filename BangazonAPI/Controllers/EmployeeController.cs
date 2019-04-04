@@ -60,27 +60,46 @@ namespace BangazonAPI.Controllers
                         int employeeId = reader.GetInt32(reader.GetOrdinal("Id"));
                         if (!employees.ContainsKey(employeeId))
                         {
-                            Employee newEmployee = new Employee
+                            if (!reader.IsDBNull(reader.GetOrdinal("ComputerId")))
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                                IsSuperVisor = reader.GetBoolean(reader.GetOrdinal("IsSuperVisor")),
-                                DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                                Department = new Department
+                                Employee newEmployee = new Employee
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                                    Name = reader.GetString(reader.GetOrdinal("DeptName"))
-                                },
-                                Computer = new Computer
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                    IsSuperVisor = reader.GetBoolean(reader.GetOrdinal("IsSuperVisor")),
+                                    DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                    Department = new Department
+                                    {
+                                        Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                        Name = reader.GetString(reader.GetOrdinal("DeptName"))
+                                    },
+                                    Computer = new Computer
+                                    {
+                                        Id = reader.GetInt32(reader.GetOrdinal("ComputerId")),
+                                        Make = reader.GetString(reader.GetOrdinal("Make")),
+                                        Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer"))
+                                    }
+                                };
+                                employees.Add(employeeId, newEmployee);
+                            }
+                            else
+                            {
+                                Employee newEmployee = new Employee
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("ComputerId")),
-                                    Make = reader.GetString(reader.GetOrdinal("Make")),
-                                    Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer"))
-                                }
-                            };
-
-                            employees.Add(employeeId, newEmployee);
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                    IsSuperVisor = reader.GetBoolean(reader.GetOrdinal("IsSuperVisor")),
+                                    DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                    Department = new Department
+                                    {
+                                        Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                        Name = reader.GetString(reader.GetOrdinal("DeptName"))
+                                    }
+                                };
+                                employees.Add(employeeId, newEmployee);
+                            }
                         }
 
                     }
@@ -119,29 +138,138 @@ namespace BangazonAPI.Controllers
 
                     if (reader.Read())
                     {
-                        employee = new Employee
+                        if (!reader.IsDBNull(reader.GetOrdinal("ComputerId")))
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            IsSuperVisor = reader.GetBoolean(reader.GetOrdinal("IsSuperVisor")),
-                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                            Department = new Department
+                            employee = new Employee
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                                Name = reader.GetString(reader.GetOrdinal("DeptName"))
-                            },
-                            Computer = new Computer
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                IsSuperVisor = reader.GetBoolean(reader.GetOrdinal("IsSuperVisor")),
+                                DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                Department = new Department
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                    Name = reader.GetString(reader.GetOrdinal("DeptName"))
+                                },
+                                Computer = new Computer
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("ComputerId")),
+                                    Make = reader.GetString(reader.GetOrdinal("Make")),
+                                    Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer"))
+                                }
+                            };
+                        }
+                        else
+                        {
+                            employee = new Employee
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("ComputerId")),
-                                Make = reader.GetString(reader.GetOrdinal("Make")),
-                                Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer"))
-                            }
-                        };
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                IsSuperVisor = reader.GetBoolean(reader.GetOrdinal("IsSuperVisor")),
+                                DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                Department = new Department
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                    Name = reader.GetString(reader.GetOrdinal("DeptName"))
+                                }
+                            };
+                        }
                     }
 
                     reader.Close();
                     return employee;
+                }
+            }
+        }
+
+        /*******************
+         * CREATE EMPLOYEE
+        *******************/
+        // POST api/employees
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] Employee newEmployee)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO Employee (FirstName, LastName, IsSuperVisor, DepartmentId)
+                                        OUTPUT INSERTED.Id
+                                        VALUES (@firstname, @lastname, @supervisor, @deptId)";
+                    cmd.Parameters.Add(new SqlParameter("@firstname", newEmployee.FirstName));
+                    cmd.Parameters.Add(new SqlParameter("@lastname", newEmployee.LastName));
+                    cmd.Parameters.Add(new SqlParameter("@supervisor", newEmployee.IsSuperVisor));
+                    cmd.Parameters.Add(new SqlParameter("@deptId", newEmployee.DepartmentId));
+
+                    int newId = (int)cmd.ExecuteScalar();
+                    newEmployee.Id = newId;
+                    return CreatedAtRoute("GetEmployee", new { id = newId }, newEmployee);
+                }
+            }
+        }
+
+        /*****************
+         * EDIT EMPLOYEE
+        *****************/
+        // PUT api/employees/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Employee employee)
+        {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"UPDATE Employee
+                                            SET FirstName = @firstname, LastName = @lastname, IsSuperVisor = @supervisor, DepartmentId = @deptid
+                                            WHERE Id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@firstname", employee.FirstName));
+                        cmd.Parameters.Add(new SqlParameter("@lastname", employee.LastName));
+                        cmd.Parameters.Add(new SqlParameter("@supervisor", employee.IsSuperVisor));
+                        cmd.Parameters.Add(new SqlParameter("@deptId", employee.DepartmentId));
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status200OK);
+                        }
+                        throw new Exception("No rows affected");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!ObjectExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+        private bool ObjectExists(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT Id, FirstName, LastName
+                                        FROM Employee
+                                        WHERE Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    return reader.Read();
                 }
             }
         }
