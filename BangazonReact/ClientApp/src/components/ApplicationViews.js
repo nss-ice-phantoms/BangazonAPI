@@ -4,7 +4,7 @@ import banazondData from '../modules/bangazonData'
 import DepartmentList from './departments/DepartmentList';
 import ComputerList from './computers/ComputerList';
 import CustomerList from './customers/CustomerList';
-import PaymentTypesList from './paymentTypes/PaymentTypeList';
+import PaymentTypeList from './paymentTypes/PaymentTypeList';
 import ProductList from './products/ProductList';
 import TrainingProgramList from './trainingPrograms/TrainingProgramList';
 // import SearchResults from './nav/SearchResults';
@@ -52,7 +52,7 @@ export default class ApplicationViews extends Component {
         <Route exact path="/customers" render={(props) => {
           return <CustomerList {...props} customers={this.state.customers}/>}} />
         <Route exact path="/paymentTypes" render={(props) => {
-          return <PaymentTypesList {...props} paymentTypes={this.state.paymentTypes}/>}} />
+          return <PaymentTypeList {...props} paymentTypes={this.state.paymentTypes}/>}} />
         <Route exact path="/products" render={(props) => {
           return <ProductList {...props} products={this.state.products}/>}} />
         <Route exact path="/trainingPrograms" render={(props) => {
