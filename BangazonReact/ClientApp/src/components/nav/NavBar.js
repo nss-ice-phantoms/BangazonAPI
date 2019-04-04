@@ -13,15 +13,21 @@ class NavBar extends Component {
                     <li className="nav-item">
                         <Link className="nav-link" to="/">Departments</Link>
                     </li>
-                    {/* <li className="nav-item">
+                    <li className="nav-item">
+                        <Link className="nav-link" to="/computers">Computers</Link>
+                    </li>
+                    <li className="nav-item">
                         <Link className="nav-link" to="/customers">Customers</Link>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link" to="/employees">Employees</Link>
+                        <Link className="nav-link" to="/paymentTypes">PaymentTypes</Link>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link" to="/orders">Orders</Link>
-                    </li> */}
+                        <Link className="nav-link" to="/products">Products</Link>
+                    </li>
+                    <li className="nav-item">
+                        <Link className="nav-link" to="/trainingPrograms">TrainingPrograms</Link>
+                    </li>
                 </ul>
                 {/* <Link to="/searchresults"><Search jsonQuery={this.props.jsonQuery} results={this.props.results} handleInputChange={this.props.handleInputChange}/></Link> */}
             </nav>
