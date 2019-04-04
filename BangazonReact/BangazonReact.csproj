@@ -26,6 +26,9 @@
     <None Remove="ClientApp\src\components\Home.js" />
     <None Remove="ClientApp\src\components\NavMenu.js" />
     <None Include="ClientApp\src\components\Bangazon.js" />
+    <None Remove="ClientApp\src\components\orders\Department.js" />
+    <None Remove="ClientApp\src\components\orders\Department.js" />
+    <None Remove="ClientApp\src\components\orders\Department.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,6 +39,13 @@
   <ItemGroup>
     <Folder Include="ClientApp\src\components\" />
     <Folder Include="ClientApp\src\modules\" />
+    <Folder Include="ClientApp\src\components\computers\" />
+    <Folder Include="ClientApp\src\components\customers\" />
+    <Folder Include="ClientApp\src\components\employees\" />
+    <Folder Include="ClientApp\src\components\orders\" />
+    <Folder Include="ClientApp\src\components\paymenttypes\" />
+    <Folder Include="ClientApp\src\components\products\" />
+    <Folder Include="ClientApp\src\components\trainingprograms\" />
   </ItemGroup>
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
     <!-- Ensure Node.js is installed -->

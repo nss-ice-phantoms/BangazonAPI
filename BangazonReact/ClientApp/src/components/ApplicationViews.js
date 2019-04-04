@@ -2,10 +2,12 @@ import { Route } from 'react-router-dom';
 import React, { Component } from "react";
 import banazondData from '../modules/bangazonData'
 import DepartmentList from './departments/DepartmentList';
+import ComputerList from './computers/ComputerList';
+import CustomerList from './customers/CustomerList';
+import PaymentTypeList from './paymentTypes/PaymentTypeList';
+import ProductList from './products/ProductList';
+import TrainingProgramList from './trainingPrograms/TrainingProgramList';
 // import SearchResults from './nav/SearchResults';
-// import ExerciseList from './exercises/ExerciseList';
-// import InstructorList from './instructors/InstructorList';
-// import CohortList from './cohorts/CohortList';
 
 export default class ApplicationViews extends Component {
   constructor() {
@@ -13,21 +15,27 @@ export default class ApplicationViews extends Component {
     this.state = {
 
       departments: [],
-      // instructors: [],
-      // cohorts: [],
-      // exercises: []
+      computers: [],
+      customers: [],
+      paymentTypes: [],
+      products: [],
+      trainingPrograms: []
     }
   }
 
   populateAppState () {
     banazondData.handleData({dataSet: 'departments', fetchType: 'GET', embedItem: ""})
       .then(departments => {this.setState({departments: departments}, ()=>null)})
-      // .then(() => banazondData.handleData({dataSet: 'instructors', fetchType: 'GET', embedItem: "?_expand=employee"}))
-      // .then(instructors => {this.setState({instructors: instructors}, ()=>null)})
-      // .then(() => banazondData.handleData({dataSet: 'cohorts', fetchType: 'GET', embedItem: ""}))
-      // .then(cohorts => {this.setState({cohorts: cohorts}, ()=>null)})
-      // .then(() => banazondData.handleData({dataSet: 'exercises', fetchType: 'GET', embedItem: ""}))
-      // .then(exercises => {this.setState({exercises: exercises}, ()=>null)})
+      .then(() => banazondData.handleData({dataSet: 'computers', fetchType: 'GET', embedItem: ""}))
+      .then(computers => {this.setState({computers: computers}, ()=>null)})
+      .then(() => banazondData.handleData({dataSet: 'customers', fetchType: 'GET', embedItem: ""}))
+      .then(customers => {this.setState({customers: customers}, ()=>null)})
+      .then(() => banazondData.handleData({dataSet: 'paymentTypes', fetchType: 'GET', embedItem: ""}))
+      .then(paymentTypes => {this.setState({paymentTypes: paymentTypes}, ()=>null)})
+      .then(() => banazondData.handleData({dataSet: 'products', fetchType: 'GET', embedItem: ""}))
+      .then(products => {this.setState({products: products}, ()=>null)})
+      .then(() => banazondData.handleData({dataSet: 'trainingPrograms', fetchType: 'GET', embedItem: ""}))
+      .then(trainingPrograms => {this.setState({trainingPrograms: trainingPrograms}, ()=>null)})
   }
 
   componentDidMount () {
@@ -39,13 +47,17 @@ export default class ApplicationViews extends Component {
       <React.Fragment>
         <Route exact path="/" render={(props) => {
           return <DepartmentList {...props} departments={this.state.departments} />}} />
-        {/* <Route exact path="/exercises" render={(props) => {
-          return <ExerciseList exercises={this.state.exercises}  />}} />
-        <Route exact path="/instructors" render={(props) => {
-          return <InstructorList {...props} instructors={this.state.instructors}/>}} />
-        <Route exact path="/cohorts" render={(props) => {
-          return <CohortList {...props} cohorts={this.state.cohorts}/>}} />
-        <Route exact path="/searchresults" render={(props) => {
+        <Route exact path="/computers" render={(props) => {
+          return <ComputerList {...props} computers={this.state.computers}  />}} />
+        <Route exact path="/customers" render={(props) => {
+          return <CustomerList {...props} customers={this.state.customers}/>}} />
+        <Route exact path="/paymentTypes" render={(props) => {
+          return <PaymentTypeList {...props} paymentTypes={this.state.paymentTypes}/>}} />
+        <Route exact path="/products" render={(props) => {
+          return <ProductList {...props} products={this.state.products}/>}} />
+        <Route exact path="/trainingPrograms" render={(props) => {
+          return <TrainingProgramList {...props} trainingPrograms={this.state.trainingPrograms}/>}} />
+         {/* <Route exact path="/searchresults" render={(props) => {
           return <SearchResults jsonQuery={this.props.jsonQuery} results={this.props.results} handleInputChange={this.props.handleInputChange}/>}} /> */}
       </React.Fragment>
     )
