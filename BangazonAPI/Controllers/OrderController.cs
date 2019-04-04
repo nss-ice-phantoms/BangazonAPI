@@ -49,7 +49,7 @@ namespace BangazonAPI.Controllers
                     
                     if (_include == "products")
                     {
-                        cmd.CommandText += ", p.Id AS ProductId, p.Title AS ProductTitle, p.[Description]";
+                        cmd.CommandText += ", p.Id AS ProductId, p.Title AS ProductTitle, p.[Description], p.Price, p.Quantity";
                     }
 
                     if (_include == "customers")
@@ -115,7 +115,9 @@ namespace BangazonAPI.Controllers
                                     {
                                         Id = reader.GetInt32(reader.GetOrdinal("ProductId")),
                                         Title = reader.GetString(reader.GetOrdinal("ProductTitle")),
-                                        Description = reader.GetString(reader.GetOrdinal("Description"))
+                                        Description = reader.GetString(reader.GetOrdinal("Description")),
+                                        Price = reader.GetInt32(reader.GetOrdinal("Price")),
+                                        Quantity = reader.GetInt32(reader.GetOrdinal("Quantity"))
                                     }
                                 );
                             }
@@ -161,7 +163,7 @@ namespace BangazonAPI.Controllers
 
                     if (_include == "products")
                     {
-                        cmd.CommandText += ", p.Id AS ProductId, p.Title AS ProductTitle, p.[Description]";
+                        cmd.CommandText += ", p.Id AS ProductId, p.Title AS ProductTitle, p.[Description], p.Price, p.Quantity";
                     }
 
                     if (_include == "customers" || _include == "customer")
@@ -202,7 +204,9 @@ namespace BangazonAPI.Controllers
                                     {
                                         Id = reader.GetInt32(reader.GetOrdinal("ProductId")),
                                         Title = reader.GetString(reader.GetOrdinal("ProductTitle")),
-                                        Description = reader.GetString(reader.GetOrdinal("Description"))
+                                        Description = reader.GetString(reader.GetOrdinal("Description")),
+                                        Price = reader.GetInt32(reader.GetOrdinal("Price")),
+                                        Quantity = reader.GetInt32(reader.GetOrdinal("Quantity"))
                                     }
                                 );
                             }

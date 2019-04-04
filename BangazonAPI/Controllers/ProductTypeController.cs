@@ -12,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace BangazonAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/productTypes")]
     [ApiController]
     public class ProductTypeController : ControllerBase
     {
@@ -35,7 +35,7 @@ namespace BangazonAPI.Controllers
         /*************************
          * GET ALL PRODUCT TYPES
         **************************/
-        // GET api/producttype
+        // GET api/productTypes
         [HttpGet(Name = "GetAllProductTypes")]
         public List<ProductType> GetAllProductTypes()
         {
@@ -74,7 +74,7 @@ namespace BangazonAPI.Controllers
         /***************************
          * GET SINGLE PRODUCT TYPE
         ****************************/
-        // GET api/producttype/5
+        // GET api/productTypes/5
         [HttpGet("{id}", Name = "GetProductType")]
         public ProductType Get(int id)
         {
@@ -109,7 +109,7 @@ namespace BangazonAPI.Controllers
         /**********************
          * CREATE PRODUCT TYPE
         **********************/
-        // POST api/producttype
+        // POST api/productTypes
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] ProductType newType)
         {
@@ -134,7 +134,7 @@ namespace BangazonAPI.Controllers
         /********************
          * EDIT PRODUCT TYPE
         ********************/
-        // PUT api/producttype/5
+        // PUT api/productTypes/5
         [HttpPut("{id}")]
         public async Task<IActionResult> Put([FromRoute] int id, [FromBody] ProductType productType)
         {
@@ -176,7 +176,7 @@ namespace BangazonAPI.Controllers
         /**********************
          * DELETE PRODUCT TYPE
         **********************/
-        // DELETE api/producttype/5
+        // DELETE api/productTypes/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
